@@ -12,10 +12,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ============================================================================
-// BASE DE DONNÉES EN MÉMOIRE (ARCHITECTURE D'ENTREPRISE SUPERMARCHÉ)
+// CONFIGURATION DU MAGASIN & PARAMÈTRES GLOBATION
 // ============================================================================
 
-// Configuration Paramètres Globaux
 let storeConfig = {
     store_name: "GRAND MARCHÉ SYA",
     nui: "M08120004512A",
@@ -25,137 +24,331 @@ let storeConfig = {
     admin_whatsapp: "+237600000000"
 };
 
-// Multi-Dépôts / Emplacements
+// Multi-Dépôts / Emplacements de Stock
 let warehouses = [
     { id: 'wh_main', name: 'Réserve Centrale' },
     { id: 'wh_shelf', name: 'Rayons Vente' },
     { id: 'wh_loss', name: 'Stock Avaries & Casse' }
 ];
 
-// Configuration des Points de Vente (POS)
-let posConfigs = [
-    { id: 'pos_1', name: 'Caisse Principale 01', type: 'STANDARD', printer: 'EPSON-TM88', activeSessionId: 'sess_1001', status: 'OPEN' },
-    { id: 'pos_2', name: 'Caisse Rayon Frais 02', type: 'STANDARD', printer: 'EPSON-TM88', activeSessionId: null, status: 'CLOSED' },
-    { id: 'pos_self', name: 'Borne Libre-Service 01', type: 'SELF_CHECKOUT', printer: 'KIOSK-PRINTER', activeSessionId: 'sess_self', status: 'OPEN' }
+// ============================================================================
+// BASE DE DONNÉES EN MÉMOIRE (STRUCTURE SUPERMARCHÉ & COMPTABILITÉ)
+// ============================================================================
+
+let mockPOSConfigs = [
+    { id: 'pos_caisse_1', name: 'Caisse Principale 01', status: 'OPEN', activeSessionId: 'sess_101', cashier: 'Paul', type: 'STANDARD' },
+    { id: 'pos_caisse_2', name: 'Caisse Rayon Frais 02', status: 'CLOSED', activeSessionId: null, cashier: null, type: 'STANDARD' },
+    { id: 'pos_self_checkout', name: 'Borne Libre-Service QR/MoMo', status: 'OPEN', activeSessionId: 'sess_self', cashier: 'Auto', type: 'SELF_CHECKOUT' }
 ];
 
-// Sessions Caisse
-let posSessions = [
-    { id: 'sess_1001', pos_id: 'pos_1', cashier: 'Paul', opening_balance: 50000, total_sales: 0, status: 'OPEN', opened_at: new Date().toISOString() }
+let mockSessions = [
+    { id: 'sess_101', pos_id: 'pos_caisse_1', opened_at: new Date().toISOString(), opening_balance: 50000, status: 'OPEN', total_sales: 0 }
 ];
 
-// Catalogue Produits Avancé (DLC, Codes-barres, Tarifs dégressifs)
-let products = [
+// Catalogue étendu avec DLC (Anti-gaspi), Multi-dépôt et codes-barres
+let mockProducts = [
     { 
-        id: 'p1', ean: '376001234501', name: 'Riz Parfumé 50kg', category: 'Alimentation', 
-        cost_price: 22000, retail_price: 25000, stock_wh_main: 50, stock_wh_shelf: 12, 
-        min_stock: 10, dlc: '2026-12-31', daily_avg_sales: 4, is_anti_gaspi: false 
+        id: 'p1', code: '376001234501', name: 'Riz Parfumé 50kg', category: 'Alimentation', 
+        cost_price: 22000, retail_price: 25000, stock_qty: 15, stock_wh_main: 50, stock_wh_shelf: 15, 
+        min_stock_alert: 10, daily_avg_sales: 3, dlc: '2026-12-31', is_anti_gaspi: false 
     },
     { 
-        id: 'p2', ean: '376001234502', name: 'Lait Frais Écrémé 1L', category: 'Produits Frais', 
-        cost_price: 900, retail_price: 1200, stock_wh_main: 20, stock_wh_shelf: 6, 
-        min_stock: 15, dlc: '2026-09-28', daily_avg_sales: 5, is_anti_gaspi: false // DLC Proche !
+        id: 'p2', code: '376002456102', name: 'Huile Raffinée 1L', category: 'Alimentation', 
+        cost_price: 1100, retail_price: 1350, stock_qty: 8, stock_wh_main: 30, stock_wh_shelf: 8, 
+        min_stock_alert: 20, daily_avg_sales: 5, dlc: '2026-10-15', is_anti_gaspi: false 
     },
     { 
-        id: 'p3', ean: '200001234000', name: 'Viande Hachée (au poids)', category: 'Boucherie', 
-        cost_price: 3200, retail_price: 4500, stock_wh_main: 0, stock_wh_shelf: 18.5, 
-        min_stock: 5, dlc: '2026-09-26', daily_avg_sales: 8, is_anti_gaspi: false 
+        id: 'p3', code: '376003789203', name: 'Lait Frais Écrémé 1L', category: 'Produits Frais', 
+        cost_price: 900, retail_price: 1200, stock_qty: 12, stock_wh_main: 10, stock_wh_shelf: 12, 
+        min_stock_alert: 15, daily_avg_sales: 4, dlc: '2026-09-28', is_anti_gaspi: false // DLC courte
     }
 ];
 
-// Clients B2B & Comptes Crédit
-let b2bClients = [
+// Clients B2B & Crédits
+let mockB2BClients = [
     { id: 'cli_1', name: 'Hôtel La Résidence', credit_limit: 1000000, current_balance: 350000, status: 'APPROVED' }
 ];
 
-// Journaux Comptables & Ventes
-let sales = [];
-let accountingLedger = [];
+let mockSales = [];
+let mockAccountingEntries = [];
 let avariesLog = [];
 
 // ============================================================================
-// MOTEURS DE INTELLIGENCE SYA OS (IA, WHATSAPP & AUTOMATISATION)
+// MOTEUR IA & SERVICING WHATSAPP / ANTI-GASPI
 // ============================================================================
 
-// 1. Moteur Notification WhatsApp Simulée
-function sendWhatsAppNotification(to, message) {
-    console.log(`\n================================================`);
-    console.log(`💬 [WHATSAPP OUTBOUND -> ${to}]`);
-    console.log(message);
-    console.log(`================================================\n`);
+function analyserStocksEtAlertesIA() {
+    let alertesList = [];
+
+    mockProducts.forEach(prod => {
+        const joursRestants = prod.daily_avg_sales > 0 ? (prod.stock_qty / prod.daily_avg_sales).toFixed(1) : 999;
+
+        if (prod.stock_qty <= prod.min_stock_alert || joursRestants <= 3) {
+            const alerte = {
+                product_id: prod.id,
+                product_name: prod.name,
+                stock_actuel: prod.stock_qty,
+                jours_restants: joursRestants,
+                message: `⚠️ *Alerte Stock Prédictif* : '${prod.name}' épuisé dans ~${joursRestants} jours au rythme actuel. Stock actuel : ${prod.stock_qty} unités. Réapprovisionnement recommandé.`
+            };
+            alertesList.push(alerte);
+        }
+    });
+
+    return alertesList;
 }
 
-// 2. IA Anti-Gaspillage Proactive (Exécution Quotidienne/Événementielle)
 function runAntiGaspiEngine() {
     const today = new Date();
-    products.forEach(p => {
+    mockProducts.forEach(p => {
         const dlcDate = new Date(p.dlc);
         const diffDays = Math.ceil((dlcDate - today) / (1000 * 60 * 60 * 24));
 
-        // Si DLC < 3 jours et non encore remisé
         if (diffDays <= 3 && diffDays >= 0 && !p.is_anti_gaspi) {
             p.is_anti_gaspi = true;
             p.old_price = p.retail_price;
-            p.retail_price = Math.round(p.retail_price * 0.6); // 40% de remise automatique
+            p.retail_price = Math.round(p.retail_price * 0.6); // Remise automatique de 40%
             
-            sendWhatsAppNotification(storeConfig.admin_whatsapp, 
-                `♻️ *ACTION IA ANTI-GASPI*\nProduct: *${p.name}*\nDLC Proche (${diffDays}j restant).\nNouveau prix appliqué sur POS : *${p.retail_price} FCFA* (au lieu de ${p.old_price} FCFA).`
+            envoyerNotificationWhatsAppAdmin(
+                "Action IA Anti-Gaspi", 
+                `♻️ *PROMOTION ANTI-GASPI*\nProduit: *${p.name}*\nDLC Proche (${diffDays} jour(s) restant(s)).\nPrix remisé sur les caisses : *${p.retail_price} FCFA* (au lieu de ${p.old_price} FCFA).`
             );
         }
     });
 }
 
+function envoyerNotificationWhatsAppAdmin(titre, corpsMsg) {
+    console.log(`\n================================================`);
+    console.log(`📲 [NOTIFICATION WHATSAPP ADMIN ENVOYÉE]`);
+    console.log(`📌 SUJET: ${titre}`);
+    console.log(`💬 MESSAGE:\n${corpsMsg}`);
+    console.log(`================================================\n`);
+}
+
 // ============================================================================
-// ROUTES API REST — MÉTIER SUPERMARCHÉ & COMPTABILITÉ
+// ROUTAGE DES VUES (GESTION DES ERREURS DE ROUTE ACUEIL)
 // ============================================================================
 
-// --- CONFIGURATION FACTURATION ---
-app.get('/api/config', (req, res) => res.json(storeConfig));
-app.post('/api/config', (req, res) => {
-    storeConfig = { ...storeConfig, ...req.body };
-    res.json({ message: "Configuration mise à jour", config: storeConfig });
-});
-
-// --- CATALOGUE & ÉTIQUETAGE DYNAMIQUE ---
-app.get('/api/products', (req, res) => {
-    runAntiGaspiEngine(); // Contrôle à chaque appel catalogue
-    res.json(products);
-});
-
-// Génération de Code-Barres / Étiquette
-app.get('/api/products/barcode/:id', (req, res) => {
-    const p = products.find(prod => prod.id === req.params.id);
-    if (!p) return res.status(404).json({ error: "Produit non trouvé" });
-
-    res.json({
-        label_data: {
-            ean: p.ean,
-            name: p.name,
-            price: `${p.retail_price} FCFA`,
-            unit: p.category === 'Boucherie' ? 'KG' : 'UNIT',
-            qr_code: `SYA-PROD-${p.ean}-${p.retail_price}`
+// Redirection automatique ou envoi du fichier HTML principal si disponible
+app.get('/', (req, res) => {
+    const indexPath = path.join(__dirname, 'views', 'supermarche.html');
+    res.sendFile(indexPath, (err) => {
+        if (err) {
+            const fallbackPath = path.join(__dirname, 'public', 'supermarche.html');
+            res.sendFile(fallbackPath, (err2) => {
+                if (err2) {
+                    res.send(`
+                        <html>
+                            <head><title>SYA OS Supermarché</title></head>
+                            <body style="font-family:sans-serif; background:#0f172a; color:#fff; text-align:center; padding-top:50px;">
+                                <h1>🛒 SYA OS Supermarket Suite Active</h1>
+                                <p>Le serveur backend tourne correctement.</p>
+                                <p>Consultez les endpoints API : <code>/api/products</code>, <code>/api/pos/sessions</code></p>
+                            </body>
+                        </html>
+                    `);
+                }
+            });
         }
     });
 });
 
-// --- GESTION DES AVARIES & CASSE ---
-app.post('/api/inventory/avarie', (req, res) => {
-    const { product_id, qty, reason, cashier } = req.body;
-    let p = products.find(prod => prod.id === product_id);
+app.get('/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'supermarche.html'), (err) => {
+        if (err) res.sendFile(path.join(__dirname, 'public', 'supermarche.html'));
+    });
+});
 
-    if (!p || p.stock_wh_shelf < qty) {
-        return res.status(400).json({ error: "Stock en rayon insuffisant ou produit invalide" });
+// ============================================================================
+// API REST — CONFIGURATION & CATALOGUE DYNAMIQUE
+// ============================================================================
+
+app.get('/api/config', (req, res) => res.json(storeConfig));
+
+app.get('/api/products', (req, res) => {
+    runAntiGaspiEngine(); // Moteur Anti-Gaspi à chaque requête
+    res.json(mockProducts);
+});
+
+// Génération d'étiquetage code-barres dynamique
+app.get('/api/products/barcode/:id', (req, res) => {
+    const p = mockProducts.find(prod => prod.id === req.params.id);
+    if (!p) return res.status(404).json({ error: "Produit non trouvé" });
+
+    res.json({
+        label_data: {
+            ean: p.code,
+            name: p.name,
+            price: `${p.retail_price} FCFA`,
+            unit: p.category === 'Boucherie' ? 'KG' : 'UNITÉ',
+            qr_code: `SYA-PROD-${p.code}-${p.retail_price}`
+        }
+    });
+});
+
+// ============================================================================
+// API REST — SESSIONS POS & ENCAISSEMENT (STANDARD & SELF-CHECKOUT)
+// ============================================================================
+
+app.get('/api/pos/sessions', (req, res) => {
+    res.json({ configs: mockPOSConfigs, sessions: mockSessions });
+});
+
+app.post('/api/pos/session/toggle', (req, res) => {
+    const { pos_id, action, opening_balance, closing_balance } = req.body;
+    let pos = mockPOSConfigs.find(p => p.id === pos_id);
+
+    if (!pos) return res.status(404).json({ error: "POS introuvable" });
+
+    if (action === 'OPEN') {
+        const newSession = {
+            id: 'sess_' + Date.now(),
+            pos_id: pos.id,
+            opened_at: new Date().toISOString(),
+            opening_balance: parseFloat(opening_balance || 0),
+            status: 'OPEN',
+            total_sales: 0
+        };
+        mockSessions.push(newSession);
+        pos.status = 'OPEN';
+        pos.activeSessionId = newSession.id;
+
+        envoyerNotificationWhatsAppAdmin("Ouverture de Caisse", `🟢 Caisse '${pos.name}' ouverte avec un fond de caisse de ${opening_balance} FCFA.`);
+        return res.json({ message: "Session ouverte", session: newSession });
+    } 
+    
+    if (action === 'CLOSE') {
+        let session = mockSessions.find(s => s.id === pos.activeSessionId);
+        if (session) {
+            session.status = 'CLOSED';
+            session.closed_at = new Date().toISOString();
+            session.closing_balance = parseFloat(closing_balance || 0);
+            
+            const totalEcar = session.closing_balance - (session.opening_balance + session.total_sales);
+
+            const bilanMsg = `📊 *Bilan de Clôture - ${pos.name}*\n` +
+                `- Fond de Départ : ${session.opening_balance.toLocaleString()} FCFA\n` +
+                `- Ventes de la Session : ${session.total_sales.toLocaleString()} FCFA\n` +
+                `- Attendu en Caisse : ${(session.opening_balance + session.total_sales).toLocaleString()} FCFA\n` +
+                `- Réellement Encaissé : ${session.closing_balance.toLocaleString()} FCFA\n` +
+                `- Écart de Caisse : ${totalEcar === 0 ? '✅ 0 FCFA' : '⚠️ ' + totalEcar + ' FCFA'}`;
+
+            envoyerNotificationWhatsAppAdmin("Bilan Clôture de Caisse", bilanMsg);
+        }
+
+        pos.status = 'CLOSED';
+        pos.activeSessionId = null;
+        return res.json({ message: "Session fermée avec succès", session });
     }
 
-    // Déstockage du rayon vers dépôt Avaries
-    p.stock_wh_shelf -= qty;
+    res.status(400).json({ error: "Action invalide" });
+});
+
+app.post('/api/pos/order', (req, res) => {
+    const { pos_id, session_id, items, payment_method, cashier_name, client_type, b2b_client_id } = req.body;
+
+    let session = mockSessions.find(s => s.id === session_id);
+    if (!session || session.status !== 'OPEN') {
+        return res.status(400).json({ error: "Session de caisse fermée ou invalide" });
+    }
+
+    let orderTotal = 0;
+    let totalCostOfGoods = 0;
+
+    items.forEach(item => {
+        let prod = mockProducts.find(p => p.id === item.id);
+        if (prod) {
+            prod.stock_qty -= item.qty;
+            if (prod.stock_wh_shelf >= item.qty) prod.stock_wh_shelf -= item.qty;
+            
+            orderTotal += prod.retail_price * item.qty;
+            totalCostOfGoods += prod.cost_price * item.qty;
+        }
+    });
+
+    const taxAmount = Math.round(orderTotal * storeConfig.tva_rate);
+    const orderRef = 'POS-' + Math.floor(100000 + Math.random() * 900000);
     
+    const order = {
+        id: 'ord_' + Date.now(),
+        ref: orderRef,
+        pos_id,
+        session_id,
+        items,
+        total_amount: orderTotal,
+        tax_amount: taxAmount,
+        payment_method,
+        cashier_name: cashier_name || 'Inconnu',
+        created_at: new Date().toISOString()
+    };
+
+    mockSales.unshift(order);
+    session.total_sales += orderTotal;
+
+    // Écritures comptables OHADA intégrées
+    const dateISO = new Date().toISOString();
+    let debitAccount = payment_method === 'MOBILE_MONEY' ? '521100 (Banque/Orange/MTN MoMo)' : '571100 (Caisse)';
+    if (client_type === 'B2B') debitAccount = '411100 (Clients B2B - Compte de créance)';
+
+    mockAccountingEntries.push({
+        id: 'ecr_' + Date.now() + '_1',
+        date: dateISO,
+        ref: orderRef,
+        libelle: `Vente POS ${pos_id} - Ticket ${orderRef}`,
+        debit_account: debitAccount,
+        credit_account: '701100 (Vente de marchandises)',
+        amount: orderTotal - taxAmount
+    });
+
+    mockAccountingEntries.push({
+        id: 'ecr_' + Date.now() + '_2',
+        date: dateISO,
+        ref: orderRef,
+        libelle: `TVA Facturée - Ticket ${orderRef}`,
+        debit_account: debitAccount,
+        credit_account: '443100 (TVA Facturée sur ventes)',
+        amount: taxAmount
+    });
+
+    mockAccountingEntries.push({
+        id: 'ecr_' + Date.now() + '_3',
+        date: dateISO,
+        ref: orderRef,
+        libelle: `Variation Stock - Ticket ${orderRef}`,
+        debit_account: '603100 (Variation des stocks)',
+        credit_account: '311100 (Stock de marchandises)',
+        amount: totalCostOfGoods
+    });
+
+    const alertes = analyserStocksEtAlertesIA();
+    if (alertes.length > 0) {
+        alertes.forEach(a => envoyerNotificationWhatsAppAdmin("Alerte Réapprovisionnement", a.message));
+    }
+
+    res.status(201).json({ order, alertes_declenchees: alertes.length });
+});
+
+// ============================================================================
+// API REST — AVARIES, CASSE & PERTES EN STOCK
+// ============================================================================
+
+app.post('/api/inventory/avarie', (req, res) => {
+    const { product_id, qty, reason, cashier } = req.body;
+    let p = mockProducts.find(prod => prod.id === product_id);
+
+    if (!p || p.stock_qty < qty) {
+        return res.status(400).json({ error: "Stock insuffisant ou produit non trouvé" });
+    }
+
+    p.stock_qty -= qty;
+    p.stock_wh_shelf = Math.max(0, p.stock_wh_shelf - qty);
+
     const lossValue = p.cost_price * qty;
     const avarieEntry = { id: 'avr_' + Date.now(), product_id, qty, lossValue, reason, date: new Date().toISOString() };
     avariesLog.push(avarieEntry);
 
-    // Écriture Comptable OHADA (Perte/Casse)
-    accountingLedger.push({
+    // Écriture Comptable OHADA (Pertes sur stocks)
+    mockAccountingEntries.push({
         id: 'ecr_avr_' + Date.now(),
         date: new Date().toISOString(),
         ref: 'AVARIE-' + avarieEntry.id,
@@ -165,121 +358,71 @@ app.post('/api/inventory/avarie', (req, res) => {
         amount: lossValue
     });
 
-    sendWhatsAppNotification(storeConfig.admin_whatsapp, `🚨 *ALERTE AVARIE/CASSE*\nProduit: ${p.name}\nQté: ${qty}\nPerte : ${lossValue.toLocaleString()} FCFA\nMotif: ${reason}`);
+    envoyerNotificationWhatsAppAdmin(
+        "Alerte Avarie / Casse", 
+        `🚨 *DÉCLARATION AVARIE*\nProduit: ${p.name}\nQuantité: ${qty}\nPerte : ${lossValue.toLocaleString()} FCFA\nMotif: ${reason}`
+    );
 
-    res.json({ message: "Avarie enregistrée et comptabilisée", avarieEntry });
+    res.json({ message: "Avarie comptabilisée avec succès", avarieEntry });
 });
 
-// --- ACHAT & ENCAISSEMENT POS (STANDARD & BORNE SELF-CHECKOUT) ---
-app.post('/api/pos/checkout', (req, res) => {
-    const { pos_id, session_id, items, payment_method, client_type, b2b_client_id } = req.body;
+// ============================================================================
+// API REST — WEBHOOK INTERACTIF WHATSAPP & RAPPROCHEMENT MOMO
+// ============================================================================
 
-    let totalAmount = 0;
-    let totalCost = 0;
-
-    items.forEach(item => {
-        let p = products.find(prod => prod.id === item.id);
-        if (p) {
-            p.stock_wh_shelf -= item.qty;
-            totalAmount += p.retail_price * item.qty;
-            totalCost += p.cost_price * item.qty;
-        }
-    });
-
-    const taxAmount = Math.round(totalAmount * storeConfig.tva_rate);
-    const orderRef = 'TKT-' + Math.floor(100000 + Math.random() * 900000);
-
-    // Écritures comptables OHADA intégrées
-    const now = new Date().toISOString();
-    let accountDebit = '571100 (Caisse)';
-    if (payment_method === 'MOBILE_MONEY') accountDebit = '521100 (Banque / Orange / MTN MoMo)';
-    if (client_type === 'B2B') accountDebit = '411100 (Clients B2B - Compte de créance)';
-
-    // 1. Enregistrement Vente + TVA
-    accountingLedger.push({
-        id: 'ecr_' + Date.now() + '_1', date: now, ref: orderRef,
-        libelle: `Vente ${pos_id} - Ticket ${orderRef}`,
-        debit_account: accountDebit,
-        credit_account: '701100 (Vente de marchandises)',
-        amount: totalAmount - taxAmount
-    });
-    accountingLedger.push({
-        id: 'ecr_' + Date.now() + '_2', date: now, ref: orderRef,
-        libelle: `TVA Collectée - Ticket ${orderRef}`,
-        debit_account: accountDebit,
-        credit_account: '443100 (TVA Facturée sur ventes)',
-        amount: taxAmount
-    });
-
-    // 2. Variation de stock
-    accountingLedger.push({
-        id: 'ecr_' + Date.now() + '_3', date: now, ref: orderRef,
-        libelle: `Sortie de Stock - Ticket ${orderRef}`,
-        debit_account: '603100 (Variation des stocks)',
-        credit_account: '311100 (Stock de marchandises)',
-        amount: totalCost
-    });
-
-    const saleRecord = { id: orderRef, pos_id, totalAmount, taxAmount, payment_method, date: now };
-    sales.unshift(saleRecord);
-
-    res.status(201).json({
-        receipt: {
-            store: storeConfig.store_name,
-            nui: storeConfig.nui,
-            rc: storeConfig.rc,
-            ticket_no: orderRef,
-            total_ht: totalAmount - taxAmount,
-            tva: taxAmount,
-            total_ttc: totalAmount,
-            qr_validation: `https://sya-os.com/verify?tkt=${orderRef}&amt=${totalAmount}`
-        }
-    });
-});
-
-// --- RAPPROCHEMENT BANCAIRE AUTOMATIQUE & MOMO ---
-app.post('/api/accounting/reconcile', (req, res) => {
-    const { statement_records } = req.body; // Liste des transactions Orange/MTN/Banque reçues
-    let reconciledCount = 0;
-
-    statement_records.forEach(stmt => {
-        let match = sales.find(s => s.payment_method === 'MOBILE_MONEY' && s.totalAmount === stmt.amount && !s.reconciled);
-        if (match) {
-            match.reconciled = true;
-            match.reconciled_ref = stmt.trx_id;
-            reconciledCount++;
-        }
-    });
-
-    res.json({ message: "Rapprochement automatique effectué", reconciled_count: reconciledCount });
-});
-
-// --- WEBHOOK INTERACTIF WHATSAPP ADMIN ---
 app.post('/api/whatsapp/webhook', (req, res) => {
     const { sender, message_text } = req.body;
-    const query = message_text.toLowerCase().trim();
+    const query = (message_text || '').toLowerCase().trim();
 
-    let reply = "Désolé, commande non reconnue. Essayez 'bilan', 'stock' ou 'alertes'.";
+    let reply = "Commande non reconnue. Tapez 'bilan', 'stock' ou 'alertes'.";
 
     if (query.includes('bilan')) {
-        const totalSalesToday = sales.reduce((sum, s) => sum + s.totalAmount, 0);
-        reply = `📊 *BILAN EN TEMPS RÉEL (${new Date().toLocaleDateString()})*\n` +
-                `- Chiffre d'Affaires : *${totalSalesToday.toLocaleString()} FCFA*\n` +
-                `- Ventes Total : ${sales.length} tickets\n` +
-                `- Statut Caisses : ${posConfigs.filter(p => p.status === 'OPEN').length} Ouverte(s)`;
+        const totalSales = mockSales.reduce((sum, s) => sum + s.total_amount, 0);
+        reply = `📊 *BILAN EN TEMPS RÉEL*\n- Total Ventes : *${totalSales.toLocaleString()} FCFA*\n- Nombre de tickets : ${mockSales.length}\n- Caisses actives : ${mockPOSConfigs.filter(p => p.status === 'OPEN').length}`;
     } else if (query.includes('stock')) {
-        const lowStock = products.filter(p => p.stock_wh_shelf <= p.min_stock);
-        reply = `📦 *ÉTAT DES STOCKS CRITIQUES*\n` +
-                lowStock.map(p => `• ${p.name}: ${p.stock_wh_shelf} unités (Seuil: ${p.min_stock})`).join('\n');
+        const alertes = analyserStocksEtAlertesIA();
+        reply = alertes.length > 0 
+            ? alertes.map(a => a.message).join('\n') 
+            : "✅ Tous les stocks de tous les rayons sont suffisants.";
     }
 
-    sendWhatsAppNotification(sender, reply);
-    res.json({ success: true, replied: reply });
+    envoyerNotificationWhatsAppAdmin(`Réponse WhatsApp -> ${sender}`, reply);
+    res.json({ success: true, reply });
 });
 
-// --- COMPTABILITÉ & GRAND LIVRE ---
+app.post('/api/accounting/reconcile', (req, res) => {
+    const { statement_records } = req.body;
+    let count = 0;
+
+    if (Array.isArray(statement_records)) {
+        statement_records.forEach(stmt => {
+            let match = mockSales.find(s => s.payment_method === 'MOBILE_MONEY' && s.total_amount === stmt.amount && !s.reconciled);
+            if (match) {
+                match.reconciled = true;
+                match.reconciled_ref = stmt.trx_id;
+                count++;
+            }
+        });
+    }
+
+    res.json({ message: "Rapprochement automatique exécuté", reconciled_count: count });
+});
+
+// ============================================================================
+// API REST — COMPTABILITÉ & GRAND LIVRE OHADA
+// ============================================================================
+
 app.get('/api/accounting/ledger', (req, res) => {
-    res.json({ total: accountingLedger.length, entries: accountingLedger });
+    res.json({
+        total_entries: mockAccountingEntries.length,
+        entries: mockAccountingEntries
+    });
 });
 
-app.listen(PORT, () => console.log(`SYA OS Supermarket Enterprise System Active on Port ${PORT}`));
+// Démarrage du serveur
+app.listen(PORT, () => {
+    console.log(`================================================`);
+    console.log(`  SYA OS Core running on port ${PORT}`);
+    console.log(`  Supermarket POS & OHADA Engine active`);
+    console.log(`================================================`);
+});
