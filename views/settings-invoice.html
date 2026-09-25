@@ -3,84 +3,184 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SYA OS — Configuration Factures</title>
+  <title>SYA OS — Configuration Impression & En-tête</title>
   <style>
-    body { background-color: #0b0f19; color: white; font-family: system-ui, sans-serif; padding: 20px; }
-    .container { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; }
-    h2 { font-size: 16px; color: #38bdf8; margin-bottom: 15px; }
-    label { font-size: 12px; color: #94a3b8; display: block; margin-top: 10px; }
-    input, textarea, select { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white; box-sizing: border-box; font-size: 13px; }
-    button { background: #2563eb; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; width: 100%; margin-top: 15px; cursor: pointer; }
-    .btn-back { display: inline-block; color: #60a5fa; text-decoration: none; margin-bottom: 15px; font-size: 13px; }
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --border: #334155;
+      --primary: #2563eb;
+      --text: #f8fafc;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, sans-serif;
+      padding: 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: #94a3b8;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: white;
+      box-sizing: border-box;
+    }
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      width: 100%;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    /* Aperçu du Reçu avec Filigrane */
+    .ticket-preview {
+      background: white;
+      color: black;
+      padding: 20px;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      font-family: monospace;
+      min-height: 400px;
+    }
+    .watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-30deg);
+      opacity: 0.12;
+      max-width: 70%;
+      pointer-events: none;
+    }
+    .ticket-logo {
+      max-width: 80px;
+      max-height: 80px;
+      display: block;
+      margin: 0 auto 10px auto;
+    }
   </style>
 </head>
 <body>
-
-  <a href="/" class="btn-back">← Retour au Portail</a>
-
+  <p><a href="/" style="color: #60a5fa; text-decoration: none;">← Retour au Portail Central</a></p>
+  
   <div class="container">
+    <!-- Formulaire de Configuration -->
     <div class="card">
-      <h2>Paramètres Entreprise & Ticket</h2>
-      <form id="cfgForm">
-        <label>Nom de l'Etablissement</label>
-        <input type="text" id="companyName" value="SUPERMARCHÉ SYA OS" required />
+      <h2>⚙️ Paramètres Entreprise & Ticket</h2>
+      <br>
+      
+      <div class="form-group">
+        <label>Nom de l'Établissement</label>
+        <input type="text" id="companyName" value="SUPERMARCHÉ SYA OS" oninput="updatePreview()" />
+      </div>
 
-        <label>Sous-titre / Activité</label>
-        <input type="text" id="companyHeader" value="Alimentation Générale & Distribution" />
+      <div class="form-group">
+        <label>Sous-titre / Slogan</label>
+        <input type="text" id="companySubtitle" value="Alimentation Générale & Distribution" oninput="updatePreview()" />
+      </div>
 
-        <label>NIU / Registre</label>
-        <input type="text" id="companyTaxId" value="M081912345678A" />
+      <div class="form-group">
+        <label>Logo d'En-tête (Image)</label>
+        <input type="file" id="logoUpload" accept="image/*" onchange="previewImage(event, 'logoImg')" />
+      </div>
 
-        <label>Téléphone</label>
-        <input type="text" id="companyPhone" value="+237 600 00 00 00" />
+      <div class="form-group">
+        <label>Logo en Filigrane Arrière-plan (Document A4 / Reçu)</label>
+        <input type="file" id="watermarkUpload" accept="image/*" onchange="previewImage(event, 'watermarkImg')" />
+      </div>
 
-        <label>Format Imprimante</label>
-        <select id="printFormat">
-          <option value="58mm">Ticket Thermique 58mm</option>
-          <option value="80mm" selected>Ticket Thermique 80mm</option>
-          <option value="A4">Facture Standard A4</option>
+      <div class="form-group">
+        <label>Activer le Filigrane sur l'impression</label>
+        <select id="enableWatermark" onchange="toggleWatermark()">
+          <option value="true">Oui — Afficher en filigrane</option>
+          <option value="false">Non — Arrière-plan vierge</option>
         </select>
+      </div>
 
-        <label>Pied de Page</label>
-        <textarea id="footerText" rows="3">Les marchandises vendues ne sont ni reprises ni échangées. Merci !</textarea>
+      <div class="form-group">
+        <label>Numéro WhatsApp d'Envoi des Factures Client</label>
+        <input type="text" id="whatsappPhone" value="+237 600 00 00 00" />
+      </div>
 
-        <button type="submit">Enregistrer les Paramètres</button>
-      </form>
+      <button class="btn" onclick="alert('Paramètres d\'impression enregistrés !')">Enregistrer les Paramètres</button>
     </div>
 
-    <div class="card" style="background: white; color: black; font-family: monospace;">
-      <h2 style="color: black; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Aperçu du Ticket</h2>
-      <div id="prevName" style="text-align:center; font-weight:bold; font-size:14px;">SUPERMARCHÉ SYA OS</div>
-      <div id="prevHeader" style="text-align:center; font-size:11px;">Alimentation Générale & Distribution</div>
-      <div id="prevTax" style="text-align:center; font-size:10px;">NIU: M081912345678A | Tél: +237 600 00 00 00</div>
-      <hr style="border:0; border-top:1px dashed #000; margin:10px 0;" />
-      <div style="display:flex; justify-content:space-between; font-size:11px;">
-        <span>Art: Riz Parfumé 50kg</span>
-        <span>22 000 FCFA</span>
-      </div>
-      <hr style="border:0; border-top:1px dashed #000; margin:10px 0;" />
-      <div style="text-align:center;">
-        <div style="width:60px; height:60px; background:#000; color:white; margin:0 auto; font-size:8px; display:flex; align-items:center; justify-content:center;">[ QR CODE ]</div>
-        <small style="font-size:9px;">Sécurité Sortie</small>
+    <!-- Aperçu dynamique -->
+    <div class="card">
+      <h2>📄 Aperçu du Ticket avec Filigrane</h2>
+      <br>
+      <div class="ticket-preview" id="ticketArea">
+        <img id="watermarkImg" class="watermark" src="/images/logo-placeholder.png" alt="Filigrane" />
+        <div style="text-align: center;">
+          <img id="logoImg" class="ticket-logo" src="/images/logo-placeholder.png" alt="Logo" />
+          <h3 id="prevName">SUPERMARCHÉ SYA OS</h3>
+          <p id="prevSubtitle" style="font-size: 11px;">Alimentation Générale & Distribution</p>
+        </div>
+        <hr style="border: none; border-top: 1px dashed #ccc; margin: 15px 0;">        <div style="font-size: 12px;">
+          <p>Article: Riz Parfumé 50kg ......... 22 000 FCFA</p>
+          <p>Article: Huile Raffinée 1L ....... 1 350 FCFA</p>
+        </div>
+        <hr style="border: none; border-top: 1px dashed #ccc; margin: 15px 0;">
+        <div style="text-align: center;">
+          <strong>TOTAL : 23 350 FCFA</strong>
+          <br><br>
+          <div style="background: #000; color: white; padding: 10px; width: 80px; margin: 0 auto; font-size: 10px;">[ QR CODE ]</div>
+          <p style="font-size: 10px; margin-top: 5px;">Sécurité Sortie Gardien</p>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    document.getElementById('cfgForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const config = {
-        name: document.getElementById('companyName').value,
-        header: document.getElementById('companyHeader').value,
-        taxId: document.getElementById('companyTaxId').value,
-        phone: document.getElementById('companyPhone').value,
-        format: document.getElementById('printFormat').value,
-        footer: document.getElementById('footerText').value
+    function updatePreview() {
+      document.getElementById('prevName').innerText = document.getElementById('companyName').value;
+      document.getElementById('prevSubtitle').innerText = document.getElementById('companySubtitle').value;
+    }
+
+    function previewImage(event, targetId) {
+      const reader = new FileReader();
+      reader.onload = function() {
+        const output = document.getElementById(targetId);
+        output.src = reader.result;
       };
-      localStorage.setItem('sya_invoice_config', JSON.stringify(config));
-      alert('Configuration enregistrée !');
-    });
+      if (event.target.files[0]) {
+        reader.readAsDataURL(event.target.files[0]);
+      }
+    }
+
+    function toggleWatermark() {
+      const show = document.getElementById('enableWatermark').value === 'true';
+      document.getElementById('watermarkImg').style.display = show ? 'block' : 'none';
+    }
   </script>
 </body>
 </html>
