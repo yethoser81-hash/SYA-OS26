@@ -24,7 +24,6 @@
     .btn-checkout:hover { background: #059669; }
     input, select { background: #0f172a; border: 1px solid #475569; color: white; padding: 8px; border-radius: 6px; width: 100%; box-sizing: border-box; }
     
-    /* Styles pour la vue d'administration et de gestion par module */
     .admin-bar { background: #0f172a; border: 1px solid #2563eb; padding: 10px 15px; border-radius: 8px; margin: 15px 15px 0 15px; display: flex; justify-content: space-between; align-items: center; }
     .module-view { display: none; }
     .module-view.active { display: block; }
@@ -35,7 +34,7 @@
   <header class="dash-header">
     <div style="display: flex; align-items: center; gap: 15px;">
       <a href="/" style="color: white; text-decoration: none; font-weight: bold; font-size: 18px;">SYA OS</a>
-      <span id="moduleBadge" style="background: #2563eb; font-size: 11px; padding: 3px 8px; border-radius: 12px;">Chargement...</span>
+      <span id="moduleBadge" style="background: #2563eb; font-size: 11px; padding: 3px 8px; border-radius: 12px;">Mode: Initialisation...</span>
     </div>
     <div style="display: flex; align-items: center; gap: 15px;">
       <select id="userRole" onchange="renderInterfaceByRoleAndModule()" style="width: auto; padding: 4px 8px; font-size: 12px;">
@@ -47,34 +46,32 @@
     </div>
   </header>
 
-  <!-- Barre de gestion réservée au Super Admin -->
+  <!-- Barre de gestion Super Admin -->
   <div id="adminPanel" class="admin-bar" style="display: none;">
     <span style="font-size: 13px; font-weight: bold; color: #60a5fa;">👑 Administration & Attribution des Rôles</span>
     <div style="display: flex; gap: 10px;">
       <button onclick="ajouterElementContextuel()" style="background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">+ Ajouter Élément / Produit</button>
-      <button onclick="alert('Module d\'attribution des caisses et rôles vendeurs ouvert')" style="background: #0d9488; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">🔑 Créer Caisse / Donner Rôles</button>
+      <button onclick="alert('Module d\'attribution des caisses et rôles vendeurs')" style="background: #0d9488; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">🔑 Créer Caisse / Donner Rôles</button>
     </div>
   </div>
 
-  <!-- CONTENU DYNAMIQUE SELON LE MODULE -->
-
-  <!-- 1. VUE MICROFINANCE & TONTINE -->
+  <!-- VUE 1 : MICROFINANCE & TONTINE -->
   <div id="viewMicrofinance" class="module-view" style="padding: 15px;">
     <div class="dash-container" style="padding: 0;">
       <div class="card">
-        <h2 style="font-size: 16px; color: #38bdf8; margin-bottom: 15px;">🏦 Gestion Épargne & Crédit</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-          <input type="text" placeholder="Rechercher un membre / Compte n°..." />
-          <button style="background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer;">Rechercher Membre</button>
+        <h2 style="font-size: 16px; color: #38bdf8; margin-bottom: 15px;">🏦 Microfinance & Gestion Épargne</h2>
+        <div style="display: grid; grid-template-columns: 1fr 120px; gap: 10px; margin-bottom: 15px;">
+          <input type="text" placeholder="Rechercher membre ou N° Compte..." />
+          <button style="background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer;">Chercher</button>
         </div>
         <div style="border: 1px solid #334155; border-radius: 8px; padding: 15px; background: #0f172a;">
-          <h3 style="font-size: 14px; margin-bottom: 10px;">Opérations Récentes</h3>
-          <p style="font-size: 12px; color: #94a3b8;">Sélectionnez un membre pour effectuer un dépôt, un retrait ou suivre les remboursements de crédit.</p>
+          <h3 style="font-size: 14px; margin-bottom: 10px;">Comptes & Opérations</h3>
+          <p style="font-size: 12px; color: #94a3b8;">Sélectionnez un membre pour effectuer un dépôt, retrait ou suivi de crédit.</p>
         </div>
       </div>
       <div class="card">
-        <h2 style="font-size: 15px; color: #34d399; margin-bottom: 10px;">📥 Saisie Transaction</h2>
-        <label style="font-size: 11px; color: #94a3b8;">Type d'opération</label>
+        <h2 style="font-size: 15px; color: #34d399; margin-bottom: 10px;">📥 Nouvelle Transaction</h2>
+        <label style="font-size: 11px; color: #94a3b8;">Type d'Opération</label>
         <select style="margin-bottom: 10px;">
           <option>Dépôt Épargne</option>
           <option>Remboursement Crédit</option>
@@ -82,42 +79,57 @@
           <option>Retrait Espèces</option>
         </select>
         <label style="font-size: 11px; color: #94a3b8;">Montant (FCFA)</label>
-        <input type="number" placeholder="ex: 25000" style="margin-bottom: 15px;" />
-        <button class="btn-checkout">ENREGISTRER L'OPÉRATION</button>
+        <input type="number" placeholder="ex: 50000" style="margin-bottom: 15px;" />
+        <button class="btn-checkout">VALIDER L'OPÉRATION</button>
       </div>
     </div>
   </div>
 
-  <!-- 2. VUE PHARMACIE & MÉDICAL -->
+  <!-- VUE 2 : RESTAURANT & BAR -->
+  <div id="viewRestaurant" class="module-view" style="padding: 15px;">
+    <div class="dash-container" style="padding: 0;">
+      <div class="card">
+        <h2 style="font-size: 15px; color: #38bdf8; margin-bottom: 10px;">🍽️ Carte & Plan des Tables</h2>
+        <div class="product-grid">
+          <div class="product-card"><strong>Poulet Yassa</strong><span>3 500 FCFA</span></div>
+          <div class="product-card"><strong>Poisson Braisé</strong><span>5 000 FCFA</span></div>
+          <div class="product-card"><strong>Jus Naturel 50cl</strong><span>1 000 FCFA</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2 style="font-size: 15px; color: #38bdf8; margin-bottom: 10px;">📝 Commande Table</h2>
+        <label style="font-size: 11px; color: #94a3b8;">Numéro de Table</label>
+        <select style="margin-bottom: 10px;">
+          <option>Table 1 (Terrasse)</option>
+          <option>Table 2 (VIP)</option>
+          <option>Table 3 (Salle)</option>
+        </select>
+        <div class="total-box">TOTAL: 0 FCFA</div>
+        <button class="btn-checkout">ENVOYER EN CUISINE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VUE 3 : PHARMACIE -->
   <div id="viewPharmacy" class="module-view" style="padding: 15px;">
     <div class="dash-container" style="padding: 0;">
       <div class="card">
-        <h2 style="font-size: 15px; color: #38bdf8; margin-bottom: 10px;">💊 Stock Produits Médicaux & Ordonnances</h2>
-        <input type="text" placeholder="Rechercher médicament, DCI ou scanner code-barres..." />
-        <div class="product-grid" id="pharmaGrid">
-          <div class="product-card" onclick="addToCart('Paracétamol 500mg', 250)">
-            <strong>Paracétamol 500mg</strong>
-            <span>250 FCFA</span>
-          </div>
-          <div class="product-card" onclick="addToCart('Amoxicilline 1g', 800)">
-            <strong>Amoxicilline 1g</strong>
-            <span>800 FCFA</span>
-          </div>
+        <h2 style="font-size: 15px; color: #38bdf8; margin-bottom: 10px;">💊 Stock Produits Médicaux</h2>
+        <input type="text" placeholder="Rechercher médicament ou scanner code-barres..." />
+        <div class="product-grid" style="margin-top: 15px;">
+          <div class="product-card"><strong>Paracétamol 500mg</strong><span>250 FCFA</span></div>
+          <div class="product-card"><strong>Amoxicilline 1g</strong><span>800 FCFA</span></div>
         </div>
       </div>
       <div class="card">
         <h2 style="font-size: 15px; color: #38bdf8; margin-bottom: 10px;">🛒 Prescription & Vente</h2>
-        <table class="cart-table">
-          <thead><tr><th>Médicament</th><th style="text-align:center;">Qté</th><th style="text-align:right;">Total</th></tr></thead>
-          <tbody id="pharmaCart"><tr><td colspan="3" style="text-align:center; color:#64748b; padding:20px 0;">Panier vide</td></tr></tbody>
-        </table>
-        <div class="total-box">TOTAL: <span id="pharmaTotal">0</span> FCFA</div>
+        <div class="total-box">TOTAL: 0 FCFA</div>
         <button class="btn-checkout">VALIDER VENTE PHARMACIE</button>
       </div>
     </div>
   </div>
 
-  <!-- 3. VUE COMMERCE DÉTAIL / SUPERMARCHÉ (Caisse Classique) -->
+  <!-- VUE 4 : BOUTIQUE / SUPERMARCHÉ -->
   <div id="viewStandardPos" class="module-view" style="padding: 15px;">
     <div class="dash-container" style="padding: 0;">
       <div class="card">
@@ -129,7 +141,11 @@
             <option value="Entretien">Entretien</option>
           </select>
         </div>
-        <div class="product-grid" id="productGrid"></div>
+        <div class="product-grid" id="productGrid">
+          <div class="product-card"><strong>Riz Parfumé 50kg</strong><span>500 FCFA</span></div>
+          <div class="product-card"><strong>Huile Raffinée 1L</strong><span>1350 FCFA</span></div>
+          <div class="product-card"><strong>Savon de Ménage</strong><span>600 FCFA</span></div>
+        </div>
       </div>
       <div class="card" style="display: flex; flex-direction: column;">
         <h2 style="font-size: 15px; color: #38bdf8; margin-bottom: 10px;">🛒 Panier Caisse</h2>
@@ -161,46 +177,57 @@
   <script src="/js/printer-engine.js"></script>
   <script src="/js/dashboard.js"></script>
   <script>
-    // Récupération dynamique du paramètre URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const activeModule = urlParams.get('module') || 'boutique';
-
+    // Utilisation d'une fonction d'initialisation propre sans déclarations de variables globales en conflit
     function renderInterfaceByRoleAndModule() {
-      const role = document.getElementById('userRole').value;
-      const adminPanel = document.getElementById('adminPanel');
-      const gardienLink = document.getElementById('gardienLink');
-      const badge = document.getElementById('moduleBadge');
+      var currentParams = new URLSearchParams(window.location.search);
+      var mod = currentParams.get('module') || 'boutique';
+      var roleSelect = document.getElementById('userRole');
+      var role = roleSelect ? roleSelect.value : 'SUPER_ADMIN';
 
-      // Affichage du Panneau Admin
-      adminPanel.style.display = (role === 'SUPER_ADMIN') ? 'flex' : 'none';
+      var adminPanel = document.getElementById('adminPanel');
+      var gardienLink = document.getElementById('gardienLink');
+      var badge = document.getElementById('moduleBadge');
 
-      // Affichage de l'Écran Gardien uniquement si Supermarché
-      gardienLink.style.display = (activeModule === 'supermarket') ? 'inline' : 'none';
+      if (adminPanel) adminPanel.style.display = (role === 'SUPER_ADMIN') ? 'flex' : 'none';
+      if (gardienLink) gardienLink.style.display = (mod === 'supermarket') ? 'inline' : 'none';
+      if (badge) badge.innerText = 'Espace: ' + mod.toUpperCase();
 
-      // Mise à jour du badge
-      badge.innerText = 'Espace: ' + activeModule.toUpperCase();
+      // Cacher toutes les vues
+      var views = document.querySelectorAll('.module-view');
+      for (var i = 0; i < views.length; i++) {
+        views[i].classList.remove('active');
+      }
 
-      // Masquer toutes les vues
-      document.querySelectorAll('.module-view').forEach(el => el.classList.remove('active'));
-
-      // Afficher la vue correspondant au module
-      if (activeModule === 'microfinance') {
-        document.getElementById('viewMicrofinance').classList.add('active');
-      } else if (activeModule === 'pharmacy') {
-        document.getElementById('viewPharmacy').classList.add('active');
+      // Afficher la vue correspondante
+      if (mod === 'microfinance') {
+        var v = document.getElementById('viewMicrofinance');
+        if (v) v.classList.add('active');
+      } else if (mod === 'restaurant') {
+        var v = document.getElementById('viewRestaurant');
+        if (v) v.classList.add('active');
+      } else if (mod === 'pharmacy') {
+        var v = document.getElementById('viewPharmacy');
+        if (v) v.classList.add('active');
       } else {
-        document.getElementById('viewStandardPos').classList.add('active');
+        var v = document.getElementById('viewStandardPos');
+        if (v) v.classList.add('active');
       }
     }
 
     function ajouterElementContextuel() {
-      const nom = prompt("Nom de l'élément à ajouter pour le module " + activeModule + " :");
+      var currentParams = new URLSearchParams(window.location.search);
+      var mod = currentParams.get('module') || 'boutique';
+      var nom = prompt("Nom de l'élément à ajouter pour " + mod + " :");
       if (nom) {
-        alert("Élément '" + nom + "' ajouté avec succès à la base de données du module " + activeModule);
+        alert("Ajouté avec succès pour le module : " + mod);
       }
     }
 
-    // Exécution au chargement
+    // Exécution immédiate au chargement du DOM
+    document.addEventListener("DOMContentLoaded", function() {
+      renderInterfaceByRoleAndModule();
+    });
+    // Secours si DOMContentLoaded est déjà passé
     renderInterfaceByRoleAndModule();
   </script>
 </body>
