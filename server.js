@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ============================================================================
-// CONFIGURATION DU MAGASIN & PARAMÈTRES GLOBATION
+// 1. CONFIGURATION MAGASIN & FACTURE (PARAMÉTRABLE VIA ADMIN)
 // ============================================================================
 
 let storeConfig = {
@@ -20,11 +20,12 @@ let storeConfig = {
     nui: "M08120004512A",
     rc: "RC/DLA/2024/B/1200",
     address: "Avenue Centrale, Yaoundé",
+    phone: "+237 600 00 00 00",
     tva_rate: 0.1925, // 19.25%
-    admin_whatsapp: "+237600000000"
+    admin_whatsapp: "+237600000000",
+    footer_note: "Merci de votre visite ! Les articles vendus ne sont ni repris ni échangés."
 };
 
-// Multi-Dépôts / Emplacements de Stock
 let warehouses = [
     { id: 'wh_main', name: 'Réserve Centrale' },
     { id: 'wh_shelf', name: 'Rayons Vente' },
@@ -32,7 +33,7 @@ let warehouses = [
 ];
 
 // ============================================================================
-// BASE DE DONNÉES EN MÉMOIRE (STRUCTURE SUPERMARCHÉ & COMPTABILITÉ)
+// 2. BASE DE DONNÉES EN MÉMOIRE
 // ============================================================================
 
 let mockPOSConfigs = [
@@ -45,7 +46,6 @@ let mockSessions = [
     { id: 'sess_101', pos_id: 'pos_caisse_1', opened_at: new Date().toISOString(), opening_balance: 50000, status: 'OPEN', total_sales: 0 }
 ];
 
-// Catalogue étendu avec DLC (Anti-gaspi), Multi-dépôt et codes-barres
 let mockProducts = [
     { 
         id: 'p1', code: '376001234501', name: 'Riz Parfumé 50kg', category: 'Alimentation', 
@@ -60,11 +60,10 @@ let mockProducts = [
     { 
         id: 'p3', code: '376003789203', name: 'Lait Frais Écrémé 1L', category: 'Produits Frais', 
         cost_price: 900, retail_price: 1200, stock_qty: 12, stock_wh_main: 10, stock_wh_shelf: 12, 
-        min_stock_alert: 15, daily_avg_sales: 4, dlc: '2026-09-28', is_anti_gaspi: false // DLC courte
+        min_stock_alert: 15, daily_avg_sales: 4, dlc: '2026-09-28', is_anti_gaspi: false 
     }
 ];
 
-// Clients B2B & Crédits
 let mockB2BClients = [
     { id: 'cli_1', name: 'Hôtel La Résidence', credit_limit: 1000000, current_balance: 350000, status: 'APPROVED' }
 ];
@@ -74,7 +73,7 @@ let mockAccountingEntries = [];
 let avariesLog = [];
 
 // ============================================================================
-// MOTEUR IA & SERVICING WHATSAPP / ANTI-GASPI
+// 3. MOTEUR IA & SERVICING WHATSAPP / ANTI-GASPI
 // ============================================================================
 
 function analyserStocksEtAlertesIA() {
@@ -126,10 +125,82 @@ function envoyerNotificationWhatsAppAdmin(titre, corpsMsg) {
 }
 
 // ============================================================================
-// ROUTAGE DES VUES (GESTION DES ERREURS DE ROUTE ACUEIL)
+// 4. ROUTES D'ADMINISTRATION CRUD (CRÉATION DE POSTES, PRODUITS & CONFIG)
 // ============================================================================
 
-// Redirection automatique ou envoi du fichier HTML principal si disponible
+// --- GESTION DES POSTES DE VENTE ---
+app.get('/api/admin/pos', (req, res) => {
+    res.json(mockPOSConfigs);
+});
+
+app.post('/api/admin/pos', (req, res) => {
+    const { name, type } = req.body;
+    if (!name) return res.status(400).json({ error: "Le nom du poste est obligatoire" });
+
+    const newPOS = {
+        id: 'pos_' + Date.now(),
+        name,
+        status: 'CLOSED',
+        activeSessionId: null,
+        cashier: null,
+        type: type || 'STANDARD'
+    };
+
+    mockPOSConfigs.push(newPOS);
+    res.status(201).json({ message: "Poste de vente créé avec succès", pos: newPOS });
+});
+
+// --- GESTION DU CATALOGUE PRODUITS ---
+app.post('/api/admin/products', (req, res) => {
+    const { code, name, category, cost_price, retail_price, stock_qty, min_stock_alert, dlc } = req.body;
+
+    if (!name || !retail_price) {
+        return res.status(400).json({ error: "Nom et prix de vente sont requis" });
+    }
+
+    const qty = parseInt(stock_qty || 0);
+    const newProd = {
+        id: 'p_' + Date.now(),
+        code: code || 'CODE-' + Math.floor(100000 + Math.random() * 900000),
+        name,
+        category: category || 'Alimentation',
+        cost_price: parseFloat(cost_price || 0),
+        retail_price: parseFloat(retail_price),
+        stock_qty: qty,
+        stock_wh_main: qty,
+        stock_wh_shelf: qty,
+        min_stock_alert: parseInt(min_stock_alert || 5),
+        daily_avg_sales: 1,
+        dlc: dlc || '2027-12-31',
+        is_anti_gaspi: false
+    };
+
+    mockProducts.push(newProd);
+    res.status(201).json({ message: "Produit ajouté avec succès au catalogue", product: newProd });
+});
+
+// --- CONFIGURATION FACTURE ET ENSEIGNE ---
+app.get('/api/admin/config', (req, res) => res.json(storeConfig));
+
+app.post('/api/admin/config', (req, res) => {
+    const { store_name, nui, rc, address, phone, tva_rate, footer_note, admin_whatsapp } = req.body;
+    
+    if (store_name) storeConfig.store_name = store_name;
+    if (nui) storeConfig.nui = nui;
+    if (rc) storeConfig.rc = rc;
+    if (address) storeConfig.address = address;
+    if (phone) storeConfig.phone = phone;
+    if (admin_whatsapp) storeConfig.admin_whatsapp = admin_whatsapp;
+    if (tva_rate !== undefined) storeConfig.tva_rate = parseFloat(tva_rate);
+    if (footer_note) storeConfig.footer_note = footer_note;
+
+    res.json({ message: "Configuration de la facture et de l'enseigne mise à jour", config: storeConfig });
+});
+
+// ============================================================================
+// 5. ROUTAGE DES VUES (GESTION DE L'INTERFACE & SECOURS ANTI-PAGE BLEUE)
+// ============================================================================
+
 app.get('/', (req, res) => {
     const indexPath = path.join(__dirname, 'views', 'supermarche.html');
     res.sendFile(indexPath, (err) => {
@@ -137,15 +208,88 @@ app.get('/', (req, res) => {
             const fallbackPath = path.join(__dirname, 'public', 'supermarche.html');
             res.sendFile(fallbackPath, (err2) => {
                 if (err2) {
+                    // Rend l'interface d'administration dynamique complète en secours
                     res.send(`
-                        <html>
-                            <head><title>SYA OS Supermarché</title></head>
-                            <body style="font-family:sans-serif; background:#0f172a; color:#fff; text-align:center; padding-top:50px;">
-                                <h1>🛒 SYA OS Supermarket Suite Active</h1>
-                                <p>Le serveur backend tourne correctement.</p>
-                                <p>Consultez les endpoints API : <code>/api/products</code>, <code>/api/pos/sessions</code></p>
-                            </body>
-                        </html>
+                    <!DOCTYPE html>
+                    <html lang="fr">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>SYA OS - Panneau d'Administration</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
+                            h1, h2 { color: #38bdf8; }
+                            .card { background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #334155; }
+                            input, select, button { padding: 10px; margin: 5px 0; border-radius: 4px; border: 1px solid #475569; background: #0f172a; color: white; width: 100%; box-sizing: border-box; }
+                            button { background: #0284c7; font-weight: bold; cursor: pointer; border: none; }
+                            button:hover { background: #0369a1; }
+                            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>🛒 SYA OS — Panneau de Configuration Admin</h1>
+                        
+                        <div class="grid">
+                            <!-- Création de Poste de Vente -->
+                            <div class="card">
+                                <h2>1. Créer un Poste de Vente (Caisse)</h2>
+                                <form action="/api/admin/pos" method="POST" onsubmit="event.preventDefault(); submitForm(this);">
+                                    <label>Nom du Poste :</label>
+                                    <input type="text" name="name" placeholder="ex: Caisse Express 03" required>
+                                    <label>Type :</label>
+                                    <select name="type">
+                                        <option value="STANDARD">Standard (Caissier)</option>
+                                        <option value="SELF_CHECKOUT">Borne Libre-Service / Mobile Money</option>
+                                    </select>
+                                    <button type="submit">Créer le Poste</button>
+                                </form>
+                            </div>
+
+                            <!-- Insertion de Produit -->
+                            <div class="card">
+                                <h2>2. Insérer un Produit au Catalogue</h2>
+                                <form action="/api/admin/products" method="POST" onsubmit="event.preventDefault(); submitForm(this);">
+                                    <input type="text" name="name" placeholder="Nom du Produit (ex: Lait Frais 1L)" required>
+                                    <input type="text" name="code" placeholder="Code-barres EAN">
+                                    <input type="text" name="category" placeholder="Catégorie (ex: Alimentation)">
+                                    <input type="number" name="retail_price" placeholder="Prix de vente (FCFA)" required>
+                                    <input type="number" name="cost_price" placeholder="Prix d'achat (FCFA)">
+                                    <input type="number" name="stock_qty" placeholder="Quantité en Stock initial">
+                                    <button type="submit">Enregistrer le Produit</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Paramétrage Facture -->
+                        <div class="card">
+                            <h2>3. Configuration de la Facture & En-tête</h2>
+                            <form action="/api/admin/config" method="POST" onsubmit="event.preventDefault(); submitForm(this);">
+                                <div class="grid">
+                                    <input type="text" name="store_name" placeholder="Nom de l'enseigne" value="${storeConfig.store_name}">
+                                    <input type="text" name="nui" placeholder="NUI / Identifiant Fiscal" value="${storeConfig.nui}">
+                                    <input type="text" name="rc" placeholder="Registre du Commerce (RC)" value="${storeConfig.rc}">
+                                    <input type="text" name="phone" placeholder="Téléphone" value="${storeConfig.phone}">
+                                </div>
+                                <input type="text" name="address" placeholder="Adresse complète" value="${storeConfig.address}">
+                                <input type="text" name="footer_note" placeholder="Pied de page ticket de caisse" value="${storeConfig.footer_note}">
+                                <button type="submit">Sauvegarder les paramètres Facture</button>
+                            </form>
+                        </div>
+
+                        <script>
+                            async function submitForm(form) {
+                                const formData = new FormData(form);
+                                const data = Object.fromEntries(formData.entries());
+                                const res = await fetch(form.action, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(data)
+                                });
+                                const result = await res.json();
+                                alert(result.message || JSON.stringify(result));
+                            }
+                        </script>
+                    </body>
+                    </html>
                     `);
                 }
             });
@@ -154,23 +298,20 @@ app.get('/', (req, res) => {
 });
 
 app.get('/dashboard', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'supermarche.html'), (err) => {
-        if (err) res.sendFile(path.join(__dirname, 'public', 'supermarche.html'));
-    });
+    res.redirect('/');
 });
 
 // ============================================================================
-// API REST — CONFIGURATION & CATALOGUE DYNAMIQUE
+// 6. API REST — CATALOGUE & CODE-BARRES
 // ============================================================================
 
 app.get('/api/config', (req, res) => res.json(storeConfig));
 
 app.get('/api/products', (req, res) => {
-    runAntiGaspiEngine(); // Moteur Anti-Gaspi à chaque requête
+    runAntiGaspiEngine();
     res.json(mockProducts);
 });
 
-// Génération d'étiquetage code-barres dynamique
 app.get('/api/products/barcode/:id', (req, res) => {
     const p = mockProducts.find(prod => prod.id === req.params.id);
     if (!p) return res.status(404).json({ error: "Produit non trouvé" });
@@ -187,7 +328,7 @@ app.get('/api/products/barcode/:id', (req, res) => {
 });
 
 // ============================================================================
-// API REST — SESSIONS POS & ENCAISSEMENT (STANDARD & SELF-CHECKOUT)
+// 7. API REST — SESSIONS POS, VENTES & COMPTABILITÉ OHADA
 // ============================================================================
 
 app.get('/api/pos/sessions', (req, res) => {
@@ -329,11 +470,11 @@ app.post('/api/pos/order', (req, res) => {
 });
 
 // ============================================================================
-// API REST — AVARIES, CASSE & PERTES EN STOCK
+// 8. API REST — AVARIES, CASSE & COMPTABILITÉ
 // ============================================================================
 
 app.post('/api/inventory/avarie', (req, res) => {
-    const { product_id, qty, reason, cashier } = req.body;
+    const { product_id, qty, reason } = req.body;
     let p = mockProducts.find(prod => prod.id === product_id);
 
     if (!p || p.stock_qty < qty) {
@@ -347,7 +488,6 @@ app.post('/api/inventory/avarie', (req, res) => {
     const avarieEntry = { id: 'avr_' + Date.now(), product_id, qty, lossValue, reason, date: new Date().toISOString() };
     avariesLog.push(avarieEntry);
 
-    // Écriture Comptable OHADA (Pertes sur stocks)
     mockAccountingEntries.push({
         id: 'ecr_avr_' + Date.now(),
         date: new Date().toISOString(),
@@ -365,10 +505,6 @@ app.post('/api/inventory/avarie', (req, res) => {
 
     res.json({ message: "Avarie comptabilisée avec succès", avarieEntry });
 });
-
-// ============================================================================
-// API REST — WEBHOOK INTERACTIF WHATSAPP & RAPPROCHEMENT MOMO
-// ============================================================================
 
 app.post('/api/whatsapp/webhook', (req, res) => {
     const { sender, message_text } = req.body;
@@ -408,10 +544,6 @@ app.post('/api/accounting/reconcile', (req, res) => {
     res.json({ message: "Rapprochement automatique exécuté", reconciled_count: count });
 });
 
-// ============================================================================
-// API REST — COMPTABILITÉ & GRAND LIVRE OHADA
-// ============================================================================
-
 app.get('/api/accounting/ledger', (req, res) => {
     res.json({
         total_entries: mockAccountingEntries.length,
@@ -423,6 +555,6 @@ app.get('/api/accounting/ledger', (req, res) => {
 app.listen(PORT, () => {
     console.log(`================================================`);
     console.log(`  SYA OS Core running on port ${PORT}`);
-    console.log(`  Supermarket POS & OHADA Engine active`);
+    console.log(`  Supermarket POS & Admin Routes active`);
     console.log(`================================================`);
 });
