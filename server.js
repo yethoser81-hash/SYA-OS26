@@ -20,13 +20,31 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Enregistrement des routes de Microfinance
 app.use('/', microfinanceRoutes);
 
-// --- VUES HTML ---
+// --- ROUTAGE MODULAIRE DES VUES HTML ---
+
+// Page d'accueil / Hub
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
+// Routage dynamique selon le paramètre ?module=...
 app.get('/dashboard', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
+    const moduleQuery = req.query.module || 'boutique';
+
+    if (moduleQuery === 'microfinance' || moduleQuery === 'tontine') {
+        return res.sendFile(path.join(__dirname, 'views', 'microfinance.html'));
+    }
+
+    if (moduleQuery === 'boutique') {
+        return res.sendFile(path.join(__dirname, 'views', 'boutique.html'));
+    }
+
+    if (moduleQuery === 'supermarche') {
+        return res.sendFile(path.join(__dirname, 'views', 'supermarche.html'));
+    }
+
+    // Vue par défaut
+    res.sendFile(path.join(__dirname, 'views', 'boutique.html'));
 });
 
 app.get('/security', (req, res) => {
