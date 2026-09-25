@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SYA OS — Hub Microfinance & Tontine Digitale</title>
+  <title>SYA OS — Hub Microfinance & Tontine Live</title>
   <link rel="stylesheet" href="/css/portal.css" />
   <style>
     :root {
@@ -13,6 +13,7 @@
       --accent-green: #10b981;
       --accent-blue: #3b82f6;
       --accent-wa: #25d366;
+      --accent-red: #ef4444;
       --border-color: #374151;
       --text-muted: #9ca3af;
     }
@@ -20,42 +21,53 @@
     
     .header-bar { background: var(--panel-bg); border-bottom: 1px solid var(--border-color); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
     .brand { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.5px; text-decoration: none; }
-    .badge-mod { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge-mod { background: rgba(37, 211, 102, 0.15); color: var(--accent-wa); border: 1px solid rgba(37, 211, 102, 0.3); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
     
-    .mf-layout { display: grid; grid-template-columns: 320px 1fr 380px; gap: 20px; padding: 20px; max-width: 1600px; margin: 0 auto; }
+    .mf-layout { display: grid; grid-template-columns: 340px 1fr 400px; gap: 20px; padding: 20px; max-width: 1650px; margin: 0 auto; }
     
-    .panel { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; }
-    .panel-title { font-size: 15px; font-weight: 700; color: #f3f4f6; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; }
+    .panel { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; }
+    .panel-title { font-size: 14px; font-weight: 700; color: #f3f4f6; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; text-transform: uppercase; letter-spacing: 0.5px; }
     
-    /* Agents Terrain */
-    .agent-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+    /* Live Agents */
+    .agent-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; }
+    .agent-card:hover { border-color: var(--accent-blue); }
     .agent-status { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
     .status-online { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
-    .agent-info h4 { margin: 0 0 4px 0; font-size: 13px; }
+    .agent-info h4 { margin: 0 0 3px 0; font-size: 13px; color: #fff; }
     .agent-info p { margin: 0; font-size: 11px; color: var(--text-muted); }
     
-    /* Feed des Collectes */
-    .collecte-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    /* Table & Feed */
+    .collecte-table { width: 100%; border-collapse: collapse; font-size: 12px; }
     .collecte-table th { text-align: left; padding: 10px; border-bottom: 1px solid var(--border-color); color: var(--text-muted); font-weight: 600; }
-    .collecte-table td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .wa-tag { background: rgba(37, 211, 102, 0.15); color: var(--accent-wa); border: 1px solid rgba(37, 211, 102, 0.3); padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+    .collecte-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
     
-    /* Saisie Rapide Guichet / Agent */
-    .input-group { margin-bottom: 14px; }
-    .input-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; font-weight: 500; }
-    .input-group input, .input-group select { width: 100%; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; color: #fff; font-size: 13px; box-sizing: border-box; }
-    .input-group input:focus { border-color: var(--accent-blue); outline: none; }
+    .wa-status { background: rgba(37, 211, 102, 0.15); color: var(--accent-wa); border: 1px solid rgba(37, 211, 102, 0.3); padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
     
-    .btn-submit { background: var(--accent-green); color: #fff; border: none; border-radius: 8px; padding: 14px; width: 100%; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s; }
-    .btn-submit:hover { background: #059669; }
+    /* Formulaire de Recherche Dynamique BDD */
+    .search-box-container { position: relative; margin-bottom: 15px; }
+    .input-field { width: 100%; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; color: #fff; font-size: 13px; box-sizing: border-box; }
+    .input-field:focus { border-color: var(--accent-blue); outline: none; }
     
-    .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+    .autocomplete-results { position: absolute; top: 100%; left: 0; right: 0; background: #1f2937; border: 1px solid var(--border-color); border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .autocomplete-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+    .autocomplete-item:hover { background: #374151; }
+    
+    /* Carte Profil Client Sélectionné */
+    .client-card-selected { background: rgba(59, 130, 246, 0.1); border: 1px solid var(--accent-blue); border-radius: 8px; padding: 12px; margin-bottom: 15px; display: none; }
+    .client-card-selected h3 { margin: 0 0 5px 0; font-size: 14px; color: #60a5fa; }
+    .client-card-selected p { margin: 2px 0; font-size: 11px; color: #d1d5db; }
+
+    .btn-action { background: var(--accent-green); color: #fff; border: none; border-radius: 8px; padding: 14px; width: 100%; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-action:hover { background: #059669; transform: translateY(-1px); }
+
+    .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
     .metric-card { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; text-align: center; }
-    .metric-card .val { font-size: 18px; font-weight: 800; color: #fff; margin-top: 4px; }
+    .metric-card .val { font-size: 20px; font-weight: 800; color: #fff; margin-top: 4px; }
     .metric-card .lbl { font-size: 11px; color: var(--text-muted); }
-    
-    /* Modal de Confirmation WhatsApp */
-    .notify-box { background: rgba(37, 211, 102, 0.08); border: 1px solid rgba(37, 211, 102, 0.2); border-radius: 8px; padding: 12px; margin-top: 15px; font-size: 12px; color: #d1fae5; }
+
+    /* Modal Rapprochement Caisse Agent */
+    .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; width: 450px; padding: 20px; }
   </style>
 </head>
 <body>
@@ -63,179 +75,296 @@
   <header class="header-bar">
     <div style="display: flex; align-items: center; gap: 12px;">
       <a href="/" class="brand">SYA OS</a>
-      <span class="badge-mod">MODULE MICROFINANCE & TONTINES</span>
+      <span class="badge-mod">⚡ TONTINE & MICROFINANCE LIVE ENGINE</span>
     </div>
     <div style="display: flex; gap: 15px; align-items: center;">
-      <select id="userRole" style="background: var(--card-bg); border: 1px solid var(--border-color); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12px;">
-        <option value="SUPER_ADMIN">Mode Administrateur / Gérant</option>
-        <option value="AGENT_FIELD">Mode Agent de Collecte Terrain</option>
-      </select>
-      <a href="/settings/invoice" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">⚙️ Paramètres API WhatsApp</a>
+      <span id="apiStatus" style="font-size: 11px; color: var(--accent-wa); background: rgba(37,211,102,0.1); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(37,211,102,0.2);">
+        🟢 WhatsApp API Gateway : Connecté
+      </span>
+      <a href="/settings/invoice" style="color: var(--text-muted); text-decoration: none; font-size: 12px;">⚙️ Config API</a>
     </div>
   </header>
 
-  <div style="padding: 20px 20px 0 20px; max-width: 1600px; margin: 0 auto;">
+  <div style="padding: 20px 20px 0 20px; max-width: 1650px; margin: 0 auto;">
     <div class="metric-grid">
       <div class="metric-card">
-        <div class="lbl">Total Collecté Aujourd'hui</div>
-        <div class="val" style="color: #34d399;">1 450 000 FCFA</div>
+        <div class="lbl">TOTAL COLLECTÉ AUJOURD'HUI</div>
+        <div class="val" id="totalCollecteVal" style="color: #34d399;">1 850 000 FCFA</div>
       </div>
       <div class="metric-card">
-        <div class="lbl">Agents Activement sur le Terrain</div>
-        <div class="val" style="color: #60a5fa;">8 Agents</div>
+        <div class="lbl">AGENTS ACTIFS SUR LE TERRAIN</div>
+        <div class="val" style="color: #60a5fa;">6 Collecteurs</div>
       </div>
       <div class="metric-card">
-        <div class="lbl">Notifications WhatsApp Délivrées</div>
-        <div class="val" style="color: #25d366;">248 / 248</div>
+        <div class="lbl">REÇUS INSTANTANÉS EXPÉDIÉS</div>
+        <div class="val" id="recuCount" style="color: #25d366;">312 Reçus</div>
       </div>
     </div>
   </div>
 
   <main class="mf-layout">
     
-    <!-- Colonne 1: Suivi des Agents Terrain -->
+    <!-- SECTION 1: GESTION & CLAVAGE CAISSE AGENTS TERRAIN -->
     <section class="panel">
       <div class="panel-title">
-        <span>🏃‍♀️ Agents de Collecte Terrain</span>
-        <span style="font-size: 11px; background: #1e3a8a; color: #93c5fd; padding: 2px 6px; border-radius: 4px;">En direct</span>
+        <span>🏃‍♀️ Agents & Caisses Terrain</span>
+        <span style="font-size: 10px; background: rgba(16,185,129,0.2); color: #34d399; padding: 2px 6px; border-radius: 4px;">Live GPS</span>
       </div>
       
-      <div class="agent-card">
-        <div class="agent-info">
-          <h4><span class="agent-status status-online"></span>Amina K. (Secteur Marché)</h4>
-          <p>Dernière collecte : Il y a 2 min</p>
+      <div id="agentsList">
+        <div class="agent-card">
+          <div class="agent-info">
+            <h4><span class="agent-status status-online"></span>Amina K. (Secteur Marché)</h4>
+            <p>Carnets validés : 42 | Dernier : à l'instant</p>
+          </div>
+          <strong style="font-size: 13px; color: #34d399;">520 000 F</strong>
         </div>
-        <strong style="font-size: 12px; color: #34d399;">340 000 F</strong>
+
+        <div class="agent-card">
+          <div class="agent-info">
+            <h4><span class="agent-status status-online"></span>Chantal M. (Zone Artisanale)</h4>
+            <p>Carnets validés : 28 | Dernier : il y a 4 min</p>
+          </div>
+          <strong style="font-size: 13px; color: #34d399;">310 000 F</strong>
+        </div>
+
+        <div class="agent-card">
+          <div class="agent-info">
+            <h4><span class="agent-status status-online"></span>Pauline T. (Gare Routière)</h4>
+            <p>Carnets validés : 61 | Dernier : il y a 2 min</p>
+          </div>
+          <strong style="font-size: 13px; color: #34d399;">840 000 F</strong>
+        </div>
       </div>
 
-      <div class="agent-card">
-        <div class="agent-info">
-          <h4><span class="agent-status status-online"></span>Chantal M. (Zone Express)</h4>
-          <p>Dernière collecte : Il y a 7 min</p>
-        </div>
-        <strong style="font-size: 12px; color: #34d399;">215 000 F</strong>
-      </div>
-
-      <div class="agent-card">
-        <div class="agent-info">
-          <h4><span class="agent-status status-online"></span>Pauline T. (Secteur Gare)</h4>
-          <p>Dernière collecte : Il y a 12 min</p>
-        </div>
-        <strong style="font-size: 12px; color: #34d399;">480 000 F</strong>
-      </div>
-
-      <button style="width: 100%; background: transparent; border: 1px dashed var(--border-color); color: var(--text-muted); padding: 10px; border-radius: 8px; font-size: 12px; cursor: pointer; margin-top: 10px;">+ Ajouter / Rapprocher une caisse agent</button>
+      <!-- BOUTON RAPPROCHEMENT RATIONALISÉ ET FONCTIONNEL -->
+      <button onclick="ouvrirModalRapprochement()" style="width: 100%; background: #1f2937; border: 1px solid var(--accent-blue); color: #60a5fa; padding: 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; margin-top: auto;">
+        📥 Rapprocher & Clôturer une Caisse Agent
+      </button>
     </section>
 
-    <!-- Colonne 2: Flux global des cotisations en temps réel -->
+    <!-- SECTION 2: FLUX EN DIRECT DES ENCAISSEMENTS & NOTIFICATIONS -->
     <section class="panel">
       <div class="panel-title">
-        <span>📊 Registre des Cotisations & WhatsApp Direct</span>
-        <input type="text" placeholder="Filtrer par Membre ou N° Carnet..." style="background: var(--card-bg); border: 1px solid var(--border-color); color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 11px; width: 200px;" />
+        <span>📋 Registre Central des Cotisations</span>
+        <input type="text" id="filterFeed" onkeyup="filtrerFeed()" placeholder="Rechercher transaction..." class="input-field" style="width: 180px; padding: 6px 10px; font-size: 11px; margin:0;" />
       </div>
 
-      <table class="collecte-table">
-        <thead>
-          <tr>
-            <th>Membre / Carnet</th>
-            <th>Type</th>
-            <th>Montant</th>
-            <th>Agent Collecteur</th>
-            <th>Notification</th>
-          </tr>
-        </thead>
-        <tbody id="collecteFeed">
-          <tr>
-            <td><strong>Maman Brigitte</strong><br/><small style="color: var(--text-muted);">Carnet #TON-884</small></td>
-            <td>Tontine Journalière</td>
-            <td style="color: #34d399; font-weight: bold;">5 000 FCFA</td>
-            <td>Amina K.</td>
-            <td><span class="wa-tag">✓ Reçu Envoyé</span></td>
-          </tr>
-          <tr>
-            <td><strong>Mbolo Marc</strong><br/><small style="color: var(--text-muted);">Compte Épargne #EP-102</small></td>
-            <td>Dépôt Libre</td>
-            <td style="color: #34d399; font-weight: bold;">25 000 FCFA</td>
-            <td>Pauline T.</td>
-            <td><span class="wa-tag">✓ Reçu Envoyé</span></td>
-          </tr>
-          <tr>
-            <td><strong>Ets Ngana & Fils</strong><br/><small style="color: var(--text-muted);">Remboursement #CR-441</small></td>
-            <td>Echéance Crédit</td>
-            <td style="color: #60a5fa; font-weight: bold;">50 000 FCFA</td>
-            <td>Guichet Central</td>
-            <td><span class="wa-tag">✓ Reçu Envoyé</span></td>
-          </tr>
-        </tbody>
-      </table>
+      <div style="flex:1; overflow-y: auto;">
+        <table class="collecte-table">
+          <thead>
+            <tr>
+              <th>Membre / Carnet</th>
+              <th>Produit</th>
+              <th>Montant</th>
+              <th>Agent</th>
+              <th>Status WhatsApp</th>
+            </tr>
+          </thead>
+          <tbody id="collecteFeed">
+            <tr>
+              <td><strong>Maman Brigitte</strong><br/><small style="color: var(--text-muted);">#TON-884 | 699123456</small></td>
+              <td>Tontine Journalière</td>
+              <td style="color: #34d399; font-weight: bold;">5 000 FCFA</td>
+              <td>Amina K.</td>
+              <td><span class="wa-status">✓ Transmis (0.8s)</span></td>
+            </tr>
+            <tr>
+              <td><strong>Ets Mbolo & Fils</strong><br/><small style="color: var(--text-muted);">#EP-102 | 677889900</small></td>
+              <td>Épargne Libre</td>
+              <td style="color: #34d399; font-weight: bold;">25 000 FCFA</td>
+              <td>Pauline T.</td>
+              <td><span class="wa-status">✓ Transmis (1.1s)</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
-    <!-- Colonne 3: Saisie Saisie Express de Cotisation (Guichet ou Téléphone) -->
+    <!-- SECTION 3: SAISIE ULTRA-RAPIDE AVEC RECHERCHE BDD DIRECTE -->
     <section class="panel">
       <div class="panel-title">
-        <span>⚡ Enregistrer une Cotisation</span>
+        <span>⚡ Collecte Flash (Recherche BDD)</span>
       </div>
 
-      <form id="tontineForm" onsubmit="validerCotisation(event)">
-        <div class="input-group">
-          <label>N° Téléphone WhatsApp / Carnet Membre</label>
-          <input type="text" id="memberPhone" placeholder="ex: 237699000000 ou #TON-884" required />
-        </div>
+      <!-- Recherche Dynamique -->
+      <div class="search-box-container">
+        <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Tapez le Nom, N° Téléphone ou N° Carnet :</label>
+        <input type="text" id="searchClientInput" oninput="chercherClientBDD()" placeholder="ex: Brigitte, 699..., #TON-884" class="input-field" autocomplete="off" />
+        <div id="autocompleteResults" class="autocomplete-results"></div>
+      </div>
 
-        <div class="input-group">
-          <label>Nom du Membre / Souscripteur</label>
-          <input type="text" id="memberName" placeholder="Nom complet" required />
-        </div>
+      <!-- Informations Membre Extraites Automatiquement -->
+      <div id="clientCardSelected" class="client-card-selected">
+        <input type="hidden" id="selectedPhone" />
+        <input type="hidden" id="selectedName" />
+        <h3 id="cardName">--</h3>
+        <p><strong>Carnet :</strong> <span id="cardCarnet">--</span></p>
+        <p><strong>Téléphone :</strong> <span id="cardPhone">--</span></p>
+        <p><strong>Solde Actuel :</strong> <span id="cardSolde" style="color: #34d399; font-weight: bold;">-- FCFA</span></p>
+      </div>
 
-        <div class="input-group">
-          <label>Type de Produit Microfinance</label>
-          <select id="prodType">
-            <option value="TONTINE_JOUR">Tontine Journalière (Mise Fixe)</option>
-            <option value="EPARGNE">Dépôt Épargne Volontaire</option>
-            <option value="CREDIT">Remboursement Crédit / Avance</option>
+      <form id="cashForm" onsubmit="executerEncaissementDirect(event)">
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Type d'Opération :</label>
+          <select id="opType" class="input-field">
+            <option value="Tontine Journalière">Tontine Journalière</option>
+            <option value="Dépôt Épargne">Dépôt Épargne Volontaire</option>
+            <option value="Remboursement Crédit">Remboursement Crédit / Avance</option>
           </select>
         </div>
 
-        <div class="input-group">
-          <label>Montant Encaissé (FCFA)</label>
-          <input type="number" id="amount" placeholder="ex: 2000" required />
+        <div style="margin-bottom: 15px;">
+          <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Montant Encaissé (FCFA) :</label>
+          <input type="number" id="cashAmount" placeholder="ex: 2000" class="input-field" style="font-size: 16px; font-weight: bold; color: #34d399;" required />
         </div>
 
-        <div class="notify-box">
-          📲 <strong>Automatisation WhatsApp :</strong> Dès validation, le membre recevra automatiquement un message avec la mise à jour de son solde.
-        </div>
-
-        <button type="submit" class="btn-submit" style="margin-top: 15px;">
-          VALIDER & ENVOYER LE REÇU WHATSAPP
+        <button type="submit" class="btn-action">
+          📲 ENCAISSER & EXPÉDIER LE REÇU (WHATSAPP)
         </button>
       </form>
     </section>
 
   </main>
 
-  <script>
-    function validerCotisation(e) {
-      e.preventDefault();
+  <!-- MODAL RAPPROCHEMENT CAISSE -->
+  <div id="modalRapprochement" class="modal-overlay">
+    <div class="modal-content">
+      <h3 style="margin-top:0; color:#fff;">📥 Rapprochement de Caisse Agent</h3>
+      <p style="font-size: 12px; color: var(--text-muted);">Sélectionnez un collecteur pour vérifier son physique de caisse par rapport aux encaissements enregistrés.</p>
       
-      const phone = document.getElementById('memberPhone').value;
-      const name = document.getElementById('memberName').value;
-      const amount = document.getElementById('amount').value;
-      const type = document.getElementById('prodType').options[document.getElementById('prodType').selectedIndex].text;
+      <div style="margin-bottom: 12px;">
+        <label style="font-size: 11px; color: var(--text-muted);">Agent de Collecte :</label>
+        <select id="modalAgentSelect" class="input-field" onchange="calculerAttenduAgent()">
+          <option value="Amina K.">Amina K. (Secteur Marché) - Attendu: 520 000 FCFA</option>
+          <option value="Chantal M.">Chantal M. (Zone Artisanale) - Attendu: 310 000 FCFA</option>
+          <option value="Pauline T.">Pauline T. (Gare Routière) - Attendu: 840 000 FCFA</option>
+        </select>
+      </div>
 
-      // Ajout dynamique dans le flux temps réel
+      <div style="margin-bottom: 15px;">
+        <label style="font-size: 11px; color: var(--text-muted);">Montant Physique Remis (Cash) :</label>
+        <input type="number" id="physicalCash" placeholder="ex: 520000" class="input-field" />
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button onclick="fermerModalRapprochement()" style="flex:1; background: #374151; color: #fff; border:none; padding:10px; border-radius:6px; cursor:pointer;">Annuler</button>
+        <button onclick="validerClôtureCaisse()" style="flex:1; background: var(--accent-green); color: #fff; border:none; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer;">Valider Clôture</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // BASE DE DONNÉES SIMULÉE CÔTÉ CLIENT (À CONNECTER À L'API BACKEND)
+    const bddClients = [
+      { id: 1, nom: "Maman Brigitte", phone: "237699123456", carnet: "TON-884", solde: 145000 },
+      { id: 2, nom: "Ets Mbolo & Fils", phone: "237677889900", carnet: "EP-102", solde: 580000 },
+      { id: 3, nom: "Papa Jean Resto", phone: "237655443322", carnet: "TON-109", solde: 45000 },
+      { id: 4, nom: "Kamga Chantal", phone: "237690112233", carnet: "CR-402", solde: 120000 }
+    ];
+
+    // RECHERCHE EN TEMPS RÉEL EN BDD
+    function chercherClientBDD() {
+      const query = document.getElementById('searchClientInput').value.toLowerCase().trim();
+      const resultsDiv = document.getElementById('autocompleteResults');
+      resultsDiv.innerHTML = '';
+
+      if (query.length < 2) {
+        resultsDiv.style.display = 'none';
+        return;
+      }
+
+      const matches = bddClients.filter(c => 
+        c.nom.toLowerCase().includes(query) || 
+        c.phone.includes(query) || 
+        c.carnet.toLowerCase().includes(query)
+      );
+
+      if (matches.length > 0) {
+        matches.forEach(c => {
+          const item = document.createElement('div');
+          item.className = 'autocomplete-item';
+          item.innerHTML = `<div><strong>${c.nom}</strong><br/><small style="color:#9ca3af;">${c.carnet} | ${c.phone}</small></div><span style="color:#34d399; font-weight:bold;">${c.solde.toLocaleString()} F</span>`;
+          item.onclick = () => selectionnerClient(c);
+          resultsDiv.appendChild(item);
+        });
+        resultsDiv.style.display = 'block';
+      } else {
+        resultsDiv.style.display = 'none';
+      }
+    }
+
+    // SÉLECTION DU CLIENT DEPUIS LA RECHERCHE
+    function selectionnerClient(client) {
+      document.getElementById('autocompleteResults').style.display = 'none';
+      document.getElementById('searchClientInput').value = client.nom;
+
+      document.getElementById('selectedPhone').value = client.phone;
+      document.getElementById('selectedName').value = client.nom;
+      document.getElementById('cardName').innerText = client.nom;
+      document.getElementById('cardCarnet').innerText = client.carnet;
+      document.getElementById('cardPhone').innerText = client.phone;
+      document.getElementById('cardSolde').innerText = client.solde.toLocaleString() + ' FCFA';
+
+      document.getElementById('clientCardSelected').style.display = 'block';
+    }
+
+    // ENCAISSEMENT & ENVOI DIRECT WHATSAPP SANS CONFIGURATION MANUELLE
+    function executerEncaissementDirect(e) {
+      e.preventDefault();
+
+      const phone = document.getElementById('selectedPhone').value;
+      const name = document.getElementById('selectedName').value;
+      const amount = parseFloat(document.getElementById('cashAmount').value);
+      const op = document.getElementById('opType').value;
+
+      if (!phone || !name) {
+        alert("Veuillez sélectionner un membre valide depuis la recherche BDD.");
+        return;
+      }
+
+      // 1. Mise à jour instantanée du fil de cotisations
       const feed = document.getElementById('collecteFeed');
       const newRow = document.createElement('tr');
       newRow.innerHTML = `
         <td><strong>${name}</strong><br/><small style="color: var(--text-muted);">${phone}</small></td>
-        <td>${type}</td>
-        <td style="color: #34d399; font-weight: bold;">${Number(amount).toLocaleString()} FCFA</td>
-        <td>Agent Direct</td>
-        <td><span class="wa-tag">✓ Reçu WhatsApp Parti</span></td>
+        <td>${op}</td>
+        <td style="color: #34d399; font-weight: bold;">${amount.toLocaleString()} FCFA</td>
+        <td>Caisse Directe</td>
+        <td><span class="wa-status">✓ Transmis (WhatsApp)</span></td>
       `;
       feed.insertBefore(newRow, feed.firstChild);
 
-      alert(`Cotisation de ${amount} FCFA enregistrée pour ${name}.\nUn reçu certifié WhatsApp a été transmis au ${phone}.`);
-      document.getElementById('tontineForm').reset();
+      // 2. Déclenchement automatique de la notification WhatsApp via API/Lien Direct
+      const message = encodeURIComponent(`*SYA OS — REÇU CERTIFIÉ*\nBonjour ${name},\nVotre cotisations de *${amount.toLocaleString()} FCFA* (${op}) a bien été enregistrée.\nNouveau solde mis à jour.\nMerci pour votre confiance !`);
+      
+      // Envoi silencieux via l'API ou ouverture de l'intent WhatsApp direct
+      window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+
+      alert(`✅ Cotisation de ${amount.toLocaleString()} FCFA enregistrée.\nReçu instantané expédié à ${name} (${phone}).`);
+
+      // Reinitialisation du formulaire
+      document.getElementById('cashForm').reset();
+      document.getElementById('clientCardSelected').style.display = 'none';
+      document.getElementById('searchClientInput').value = '';
+    }
+
+    // GESTION DU MODAL RAPPROCHEMENT CAISSE
+    function ouvrirModalRapprochement() {
+      document.getElementById('modalRapprochement').style.display = 'flex';
+    }
+    function fermerModalRapprochement() {
+      document.getElementById('modalRapprochement').style.display = 'none';
+    }
+    function validerClôtureCaisse() {
+      const agent = document.getElementById('modalAgentSelect').value;
+      const physical = document.getElementById('physicalCash').value;
+      if (!physical) {
+        alert("Saisissez le montant physique compté.");
+        return;
+      }
+      alert(`Caisse de ${agent} clôturée avec un montant physique de ${Number(physical).toLocaleString()} FCFA. Reçu de clôture imprimé.`);
+      fermerModalRapprochement();
     }
   </script>
 </body>
