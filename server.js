@@ -39,8 +39,20 @@ app.get('/dashboard', (req, res) => {
         return res.sendFile(path.join(__dirname, 'views', 'boutique.html'));
     }
 
+    if (moduleQuery === 'grossiste' || moduleQuery === 'wholesale') {
+        return res.sendFile(path.join(__dirname, 'views', 'grossiste.html'));
+    }
+
     if (moduleQuery === 'supermarche') {
         return res.sendFile(path.join(__dirname, 'views', 'supermarche.html'));
+    }
+
+    if (moduleQuery === 'restaurant') {
+        return res.sendFile(path.join(__dirname, 'views', 'restaurant.html'));
+    }
+
+    if (moduleQuery === 'pharmacy' || moduleQuery === 'pharmacie') {
+        return res.sendFile(path.join(__dirname, 'views', 'pharmacie.html'));
     }
 
     // Vue par défaut

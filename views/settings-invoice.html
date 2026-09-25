@@ -1,186 +1,74 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SYA OS — Configuration Impression & En-tête</title>
+  <meta charset="UTF-8">
+  <title>Facture Officielle — SYA OS</title>
   <style>
-    :root {
-      --bg: #0f172a;
-      --panel: #1e293b;
-      --border: #334155;
-      --primary: #2563eb;
-      --text: #f8fafc;
-    }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: system-ui, sans-serif;
-      padding: 20px;
-      margin: 0;
-    }
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 5px;
-      color: #94a3b8;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      background: #0f172a;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: white;
-      box-sizing: border-box;
-    }
-    .btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 12px;
-      width: 100%;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    /* Aperçu du Reçu avec Filigrane */
-    .ticket-preview {
-      background: white;
-      color: black;
-      padding: 20px;
-      border-radius: 8px;
-      position: relative;
-      overflow: hidden;
-      font-family: monospace;
-      min-height: 400px;
-    }
-    .watermark {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(-30deg);
-      opacity: 0.12;
-      max-width: 70%;
-      pointer-events: none;
-    }
-    .ticket-logo {
-      max-width: 80px;
-      max-height: 80px;
-      display: block;
-      margin: 0 auto 10px auto;
-    }
+    body { font-family: Arial, sans-serif; padding: 40px; background: #fff; color: #000; }
+    .invoice-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 20px; }
+    .logo { font-size: 28px; font-weight: bold; color: #1e293b; }
+    .company-details { font-size: 12px; text-align: right; }
+    table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: left; font-size: 12px; }
+    th { background: #f2f2f2; }
+    .total-box { margin-top: 20px; text-align: right; font-size: 16px; font-weight: bold; }
   </style>
 </head>
 <body>
-  <p><a href="/" style="color: #60a5fa; text-decoration: none;">← Retour au Portail Central</a></p>
-  
-  <div class="container">
-    <!-- Formulaire de Configuration -->
-    <div class="card">
-      <h2>⚙️ Paramètres Entreprise & Ticket</h2>
-      <br>
-      
-      <div class="form-group">
-        <label>Nom de l'Établissement</label>
-        <input type="text" id="companyName" value="SUPERMARCHÉ SYA OS" oninput="updatePreview()" />
-      </div>
 
-      <div class="form-group">
-        <label>Sous-titre / Slogan</label>
-        <input type="text" id="companySubtitle" value="Alimentation Générale & Distribution" oninput="updatePreview()" />
-      </div>
-
-      <div class="form-group">
-        <label>Logo d'En-tête (Image)</label>
-        <input type="file" id="logoUpload" accept="image/*" onchange="previewImage(event, 'logoImg')" />
-      </div>
-
-      <div class="form-group">
-        <label>Logo en Filigrane Arrière-plan (Document A4 / Reçu)</label>
-        <input type="file" id="watermarkUpload" accept="image/*" onchange="previewImage(event, 'watermarkImg')" />
-      </div>
-
-      <div class="form-group">
-        <label>Activer le Filigrane sur l'impression</label>
-        <select id="enableWatermark" onchange="toggleWatermark()">
-          <option value="true">Oui — Afficher en filigrane</option>
-          <option value="false">Non — Arrière-plan vierge</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Numéro WhatsApp d'Envoi des Factures Client</label>
-        <input type="text" id="whatsappPhone" value="+237 600 00 00 00" />
-      </div>
-
-      <button class="btn" onclick="alert('Paramètres d\'impression enregistrés !')">Enregistrer les Paramètres</button>
+  <div class="invoice-header">
+    <div>
+      <div class="logo">SYA OS ENTERPRISE</div>
+      <p style="font-size:12px; margin:5px 0;">Solution Intégrée de Gestion (Boutique, Grossiste, Supermarché)</p>
     </div>
-
-    <!-- Aperçu dynamique -->
-    <div class="card">
-      <h2>📄 Aperçu du Ticket avec Filigrane</h2>
-      <br>
-      <div class="ticket-preview" id="ticketArea">
-        <img id="watermarkImg" class="watermark" src="/images/logo-placeholder.png" alt="Filigrane" />
-        <div style="text-align: center;">
-          <img id="logoImg" class="ticket-logo" src="/images/logo-placeholder.png" alt="Logo" />
-          <h3 id="prevName">SUPERMARCHÉ SYA OS</h3>
-          <p id="prevSubtitle" style="font-size: 11px;">Alimentation Générale & Distribution</p>
-        </div>
-        <hr style="border: none; border-top: 1px dashed #ccc; margin: 15px 0;">        <div style="font-size: 12px;">
-          <p>Article: Riz Parfumé 50kg ......... 22 000 FCFA</p>
-          <p>Article: Huile Raffinée 1L ....... 1 350 FCFA</p>
-        </div>
-        <hr style="border: none; border-top: 1px dashed #ccc; margin: 15px 0;">
-        <div style="text-align: center;">
-          <strong>TOTAL : 23 350 FCFA</strong>
-          <br><br>
-          <div style="background: #000; color: white; padding: 10px; width: 80px; margin: 0 auto; font-size: 10px;">[ QR CODE ]</div>
-          <p style="font-size: 10px; margin-top: 5px;">Sécurité Sortie Gardien</p>
-        </div>
-      </div>
+    <div class="company-details">
+      <strong>ENTREPRISE YEMGA ET FILS</strong><br>
+      RCCM : CM-YAO-2026-B-001<br>
+      Téléphone : +237 600 00 00 00<br>
+      Email : contact@yemga-fils.cm
     </div>
   </div>
 
-  <script>
-    function updatePreview() {
-      document.getElementById('prevName').innerText = document.getElementById('companyName').value;
-      document.getElementById('prevSubtitle').innerText = document.getElementById('companySubtitle').value;
-    }
+  <h3 style="margin-top:30px;">FACTURE N° : FACT-2026-0928</h3>
+  <p style="font-size:12px;"><strong>Client :</strong> Supermarché Partner / Client Passage<br><strong>Date :</strong> 25 Septembre 2026</p>
 
-    function previewImage(event, targetId) {
-      const reader = new FileReader();
-      reader.onload = function() {
-        const output = document.getElementById(targetId);
-        output.src = reader.result;
-      };
-      if (event.target.files[0]) {
-        reader.readAsDataURL(event.target.files[0]);
-      }
-    }
+  <table>
+    <thead>
+      <tr>
+        <th>Désignation / Article</th>
+        <th>Conditionnement</th>
+        <th>Quantité</th>
+        <th>Prix Unitaire (FCFA)</th>
+        <th>Total (FCFA)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Riz Parfumé Super Extra</td>
+        <td>Sac de 50 kg</td>
+        <td>10</td>
+        <td>22 000</td>
+        <td>220 000</td>
+      </tr>
+      <tr>
+        <td>Huile Raffinée Pure</td>
+        <td>Carton de 15 Litres</td>
+        <td>5</td>
+        <td>18 000</td>
+        <td>90 000</td>
+      </tr>
+    </tbody>
+  </table>
 
-    function toggleWatermark() {
-      const show = document.getElementById('enableWatermark').value === 'true';
-      document.getElementById('watermarkImg').style.display = show ? 'block' : 'none';
-    }
-  </script>
+  <div class="total-box">
+    <p>Montant Hors Taxe : 310 000 FCFA</p>
+    <p>TVA (19.25%) : 59 675 FCFA</p>
+    <p style="color:#10b981; font-size:20px;">TOTAL À PAYER : 369 675 FCFA</p>
+  </div>
+
+  <div style="margin-top:50px; font-size:10px; text-align:center; color:#666;">
+    <p>Facture générée automatiquement par SYA OS — Conforme au Système Comptable OHADA.</p>
+  </div>
+
 </body>
 </html>

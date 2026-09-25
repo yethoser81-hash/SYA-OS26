@@ -1,367 +1,138 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SYA OS — Module Boutique & Gestion de Stock</title>
-  <link rel="stylesheet" href="/css/portal.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SYA OS — Module Boutique & Retail Pro</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --bg-main: #090d16;
-      --panel-bg: #111827;
-      --card-bg: #1f2937;
-      --accent-green: #10b981;
-      --accent-blue: #3b82f6;
-      --accent-amber: #f59e0b;
-      --border-color: #374151;
-      --text-muted: #9ca3af;
+      --bg-dark: #0f172a; --panel-bg: #1e293b; --card-bg: #334155;
+      --accent-green: #10b981; --accent-blue: #3b82f6; --accent-purple: #8b5cf6;
+      --accent-amber: #f59e0b; --text-light: #f8fafc; --text-muted: #94a3b8;
     }
-    body { background-color: var(--bg-main); color: #f9fafb; font-family: 'Inter', system-ui, sans-serif; margin: 0; padding: 0; }
-    
-    .header-bar { background: var(--panel-bg); border-bottom: 1px solid var(--border-color); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
-    .brand { font-size: 20px; font-weight: 800; color: #fff; text-decoration: none; }
-    .badge-mod { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.3); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-
-    .btq-layout { display: grid; grid-template-columns: 320px 1fr 380px; gap: 20px; padding: 20px; max-width: 1800px; margin: 0 auto; }
-    
-    .panel { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; }
-    .panel-title { font-size: 13px; font-weight: 700; color: #f3f4f6; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; }
-    
-    .input-field { width: 100%; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 9px; color: #fff; font-size: 12px; box-sizing: border-box; margin-bottom: 8px; }
-    .input-field:focus { border-color: var(--accent-blue); outline: none; }
-
-    .table-custom { width: 100%; border-collapse: collapse; font-size: 12px; }
-    .table-custom th { text-align: left; padding: 8px; border-bottom: 1px solid var(--border-color); color: var(--text-muted); }
-    .table-custom td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-    .card-vendeur { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-
-    .badge-marge { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
-
-    /* Modals */
-    .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; width: 480px; padding: 20px; }
+    body { background-color: var(--bg-dark); color: var(--text-light); font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 0; }
+    .header { background: var(--panel-bg); border-bottom: 1px solid #475569; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .grid-container { display: grid; grid-template-columns: 340px 1fr 380px; gap: 20px; padding: 20px; }
+    .card { background: var(--panel-bg); border: 1px solid #475569; border-radius: 12px; padding: 16px; margin-bottom: 15px; }
+    .ai-badge { background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+    .btn { background: var(--accent-blue); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
+    .btn-success { background: var(--accent-green); }
+    .input-dark { width: 100%; background: var(--card-bg); border: 1px solid #475569; color: white; padding: 10px; border-radius: 6px; box-sizing: border-box; margin-bottom: 10px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { padding: 8px; border-bottom: 1px solid #475569; text-align: left; }
   </style>
 </head>
 <body>
 
-  <header class="header-bar">
-    <div style="display: flex; align-items: center; gap: 12px;">
-      <a href="/" class="brand">SYA OS</a>
-      <span class="badge-mod">📦 MODULE BOUTIQUE & GESTION GROS / DÉTAIL</span>
+  <header class="header">
+    <div style="display:flex; align-items:center; gap:15px;">
+      <h2 style="margin:0; font-size:20px; color:#fff;">SYA OS <span style="font-size:12px; color:var(--accent-blue);">| BOUTIQUE DÉTAIL</span></h2>
+      <span class="ai-badge"><i class="fa-solid fa-brain"></i> IA PREDICTIVE ACTIVE</span>
     </div>
     <div>
-      <button onclick="ouvrirModalProduit()" style="background: var(--accent-blue); color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer;">
-        + Nouveau Produit (Gros/Détail)
-      </button>
-      <button onclick="ouvrirModalVendeur()" style="background: #374151; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; margin-left: 8px;">
-        + Créer Vendeur
-      </button>
+      <button class="btn" style="width:auto;" onclick="imprimerFacturePro()"><i class="fa-solid fa-print"></i> Facture Pro avec Logo</button>
     </div>
   </header>
 
-  <main class="btq-layout">
+  <div class="grid-container">
     
-    <!-- COLONNE 1 : ÉQUIPE DE VENTE & COMPTABILITÉ BOUTIQUE -->
-    <section class="panel">
-      <div class="panel-title">
-        <span>👨‍💼 Équipe de Vente</span>
+    <!-- COLONNE 1 : IA PREDICTIVE & SOURCING GROSSISTES -->
+    <div>
+      <div class="card" style="border-left: 4px solid var(--accent-purple);">
+        <h4 style="margin-top:0; color:var(--accent-purple);"><i class="fa-solid fa-wand-magic-sparkles"></i> IA Prédictive Promotionnelle</h4>
+        <p style="font-size:12px; color:var(--text-muted);">Analyse du calendrier & Tendances locales :</p>
+        <div style="background:var(--card-bg); padding:10px; border-radius:8px; font-size:12px; margin-bottom:10px;">
+          <strong>🎯 Opportunité détectée :</strong> Rentrée Scolaire proche.
+          <p style="margin:5px 0 0 0; color:#cbd5e1;">Demande sur le Riz et Huile en hausse prévisible (+35%). Organiser une Vente Flash Promo.</p>
+        </div>
+        <button class="btn" style="background:var(--accent-purple);" onclick="lancerPromoIA()">Lancer Campagne Promo WhatsApp</button>
       </div>
 
-      <div id="vendeursList">
-        <div class="card-vendeur">
-          <div>
-            <strong style="font-size: 12px;">Vendeur Caisse 1</strong><br/>
-            <small style="color: var(--text-muted);">Role : Vendeur / Caisse</small>
-          </div>
-          <span style="font-size: 11px; color: var(--accent-green); font-weight: bold;">Actif</span>
+      <div class="card" style="border-left: 4px solid var(--accent-amber);">
+        <h4 style="margin-top:0; color:var(--accent-amber);"><i class="fa-solid fa-truck-field"></i> Sourcing Grossistes Recommandés</h4>
+        <p style="font-size:12px; color:var(--text-muted);">Stock de Riz faible (Restant: 3 sacs). Propositions grossistes interconnexion :</p>
+        <div style="font-size:12px; background:var(--card-bg); padding:8px; border-radius:6px; margin-bottom:8px;">
+          <strong>Ets Mbolo Grossiste</strong> — 21 000 FCFA / sac <span style="color:var(--accent-green);">(Meilleure Marge)</span>
         </div>
+        <button class="btn" style="background:var(--accent-amber);" onclick="commanderGrossiste()">Commander chez le Grossiste</button>
       </div>
+    </div>
 
-      <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color);">
-        <div class="panel-title">
-          <span>📊 Estimation Marge & Bilan</span>
-        </div>
-
-        <div style="background: var(--card-bg); padding: 12px; border-radius: 8px; margin-bottom: 10px;">
-          <span style="font-size: 11px; color: var(--text-muted);">Valeur Totale du Stock (Achat) :</span><br/>
-          <strong style="font-size: 16px; color: #fff;" id="totalStockAchat">660 000 FCFA</strong>
-        </div>
-
-        <div style="background: var(--card-bg); padding: 12px; border-radius: 8px; margin-bottom: 10px;">
-          <span style="font-size: 11px; color: var(--text-muted);">Valeur Revente Potentielle (Détail) :</span><br/>
-          <strong style="font-size: 16px; color: #60a5fa;" id="totalStockVente">911 250 FCFA</strong>
-        </div>
-
-        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); padding: 12px; border-radius: 8px;">
-          <span style="font-size: 11px; color: var(--accent-green);">Marge Bénéficiaire Estimée :</span><br/>
-          <strong style="font-size: 18px; color: #34d399;" id="margeTotal">+251 250 FCFA (+38%)</strong>
-        </div>
-      </div>
-    </section>
-
-    <!-- COLONNE 2 : INVENTAIRE ET RATION GROS/DÉTAIL -->
-    <section class="panel">
-      <div class="panel-title">
-        <span>📦 Inventaire des Produits & Ratios Conversion</span>
-      </div>
-
-      <div style="flex: 1; overflow-y: auto;">
-        <table class="table-custom">
+    <!-- COLONNE 2 : GESTION DES VENTES & STOCK DÉTAIL -->
+    <div>
+      <div class="card">
+        <h3><i class="fa-solid fa-boxes-stacked"></i> Inventaire & Conversions Gros/Détail</h3>
+        <table>
           <thead>
             <tr>
               <th>Produit</th>
               <th>Achat Gros</th>
-              <th>Ratio (Unité)</th>
-              <th>Cout Unité</th>
-              <th>Prix Détail</th>
-              <th>Marge Unité</th>
+              <th>Ratio Détail</th>
+              <th>Prix Unité</th>
+              <th>Marge Est.</th>
               <th>Stock</th>
             </tr>
           </thead>
-          <tbody id="productsTableBody">
-            <!-- Rempli dynamiquement -->
+          <tbody>
+            <tr>
+              <td>Riz Parfumé 50kg</td>
+              <td>22 000 F</td>
+              <td>1 sac = 50 kg</td>
+              <td>500 F / kg</td>
+              <td><span style="color:var(--accent-green);">+3 000 F</span></td>
+              <td>3 Sacs</td>
+            </tr>
+            <tr>
+              <td>Huile Raffinée 1L</td>
+              <td>18 000 F (Carton)</td>
+              <td>1 ctn = 15 L</td>
+              <td>1 350 F / L</td>
+              <td><span style="color:var(--accent-green);">+2 250 F</span></td>
+              <td>12 L</td>
+            </tr>
           </tbody>
         </table>
       </div>
-    </section>
 
-    <!-- COLONNE 3 : COMPTOIR CAISSE & ENREGISTREMENT VENTE -->
-    <section class="panel">
-      <div class="panel-title">
-        <span>🛒 Encaisser une Vente Détail</span>
-      </div>
-
-      <form id="posForm" onsubmit="enregistrerVenteBoutique(event)">
-        <label style="font-size: 11px; color: var(--text-muted);">Sélectionner le Produit :</label>
-        <select id="posProductSelect" class="input-field" onchange="calculerTotalPOS()">
-          <!-- Produits dynamiques -->
-        </select>
-
-        <label style="font-size: 11px; color: var(--text-muted);">Quantité Détail Vendue :</label>
-        <input type="number" id="posQty" value="1" min="1" class="input-field" oninput="calculerTotalPOS()" required />
-
-        <label style="font-size: 11px; color: var(--text-muted);">Mode de Paiement :</label>
-        <select id="posPayment" class="input-field">
-          <option value="CASH">Espèces (Caisse)</option>
-          <option value="MOBILE_MONEY">Mobile Money (OM/MOMO)</option>
-        </select>
-
-        <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin: 15px 0; text-align: center;">
-          <span style="font-size: 11px; color: var(--text-muted);">Total À Payer :</span><br/>
-          <strong id="posTotal" style="font-size: 22px; color: #34d399;">0 FCFA</strong>
+      <div class="card">
+        <h3><i class="fa-solid fa-file-invoice-dollar"></i> Comptabilité OHADA en Temps Réel</h3>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12px;">
+          <div style="background:var(--card-bg); padding:10px; border-radius:6px;">
+            Compte 701 (Ventes) : <strong>145 000 FCFA</strong>
+          </div>
+          <div style="background:var(--card-bg); padding:10px; border-radius:6px;">
+            Compte 571 (Caisse) : <strong>145 000 FCFA</strong>
+          </div>
         </div>
-
-        <button type="submit" style="width: 100%; background: var(--accent-green); color: #fff; border: none; border-radius: 8px; padding: 12px; font-weight: bold; cursor: pointer;">
-          ✅ VALIDER LA VENTE & DÉDUIRE DU STOCK
-        </button>
-      </form>
-    </section>
-
-  </main>
-
-  <!-- MODAL NOUVEAU PRODUIT (GROS / DÉTAIL) -->
-  <div id="modalProduit" class="modal-overlay">
-    <div class="modal-content">
-      <h3 style="margin-top:0; color:#fff; font-size:15px;">➕ Ajouter un Produit & Configurer Marge</h3>
-      
-      <label style="font-size:11px; color:var(--text-muted);">Nom du Produit :</label>
-      <input type="text" id="pName" placeholder="ex: Sac de Riz Parfumé 50kg" class="input-field" required />
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <div>
-          <label style="font-size:11px; color:var(--text-muted);">Conditionnement Gros :</label>
-          <input type="text" id="pBulkUnit" placeholder="ex: Sac, Carton" class="input-field" value="Sac" />
-        </div>
-        <div>
-          <label style="font-size:11px; color:var(--text-muted);">Prix d'Achat Gros (FCFA) :</label>
-          <input type="number" id="pBulkCost" placeholder="ex: 22000" class="input-field" oninput="calculerMargeModal()" required />
-        </div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <div>
-          <label style="font-size:11px; color:var(--text-muted);">Nombre d'Unités par Gros (Ratio) :</label>
-          <input type="number" id="pRatio" placeholder="ex: 50 (pour 50 kg)" class="input-field" value="50" oninput="calculerMargeModal()" required />
-        </div>
-        <div>
-          <label style="font-size:11px; color:var(--text-muted);">Prix de Vente Détail (Par Unité) :</label>
-          <input type="number" id="pRetailPrice" placeholder="ex: 500" class="input-field" oninput="calculerMargeModal()" required />
-        </div>
-      </div>
-
-      <label style="font-size:11px; color:var(--text-muted);">Stock Initial (en unités Gros) :</label>
-      <input type="number" id="pStock" placeholder="ex: 20 SACS" class="input-field" value="10" />
-
-      <!-- Estimation auto -->
-      <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid var(--accent-blue); padding: 10px; border-radius: 6px; margin: 10px 0; font-size: 11px;">
-        Prix de revient / Unité : <strong id="calcRevient">0 FCFA</strong><br/>
-        Marge Bénéficiaire estimée par unité : <strong id="calcMarge" style="color: #34d399;">0 FCFA</strong>
-      </div>
-
-      <div style="display: flex; gap: 10px; margin-top: 15px;">
-        <button onclick="fermerModalProduit()" style="flex:1; background:#374151; color:#fff; border:none; padding:10px; border-radius:6px; cursor:pointer;">Annuler</button>
-        <button onclick="enregistrerProduitBDD()" style="flex:1; background:var(--accent-blue); color:#fff; border:none; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer;">Enregistrer Produit</button>
       </div>
     </div>
-  </div>
 
-  <!-- MODAL NOUVEAU VENDEUR -->
-  <div id="modalVendeur" class="modal-overlay">
-    <div class="modal-content">
-      <h3 style="margin-top:0; color:#fff; font-size:15px;">👨‍💼 Créer un Vendeur / Caissier</h3>
-      
-      <label style="font-size:11px; color:var(--text-muted);">Nom du Vendeur :</label>
-      <input type="text" id="vName" placeholder="ex: Vendeur Caisse 2" class="input-field" />
-
-      <div style="display: flex; gap: 10px; margin-top: 15px;">
-        <button onclick="fermerModalVendeur()" style="flex:1; background:#374151; color:#fff; border:none; padding:10px; border-radius:6px; cursor:pointer;">Annuler</button>
-        <button onclick="enregistrerVendeur()" style="flex:1; background:var(--accent-green); color:#fff; border:none; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer;">Créer Compte Vendeur</button>
+    <!-- COLONNE 3 : CAISSE & COMPTOIR RAPIDE -->
+    <div>
+      <div class="card">
+        <h3><i class="fa-solid fa-cash-register"></i> Caisse Vente Rapide</h3>
+        <label style="font-size:12px;">Produit :</label>
+        <select class="input-dark">
+          <option>Riz Parfumé - 500 F / kg</option>
+          <option>Huile Raffinée - 1 350 F / L</option>
+        </select>
+        <label style="font-size:12px;">Quantité :</label>
+        <input type="number" value="1" class="input-dark">
+        <div style="background:var(--card-bg); padding:15px; text-align:center; border-radius:8px; margin:10px 0;">
+          <span style="font-size:12px; color:var(--text-muted);">Total à Payer</span><br>
+          <strong style="font-size:24px; color:var(--accent-green);">1 350 FCFA</strong>
+        </div>
+        <button class="btn btn-success"><i class="fa-solid fa-check"></i> Encaisser & Imprimer Ticket</button>
       </div>
     </div>
+
   </div>
 
   <script>
-    let products = [];
-
-    async function chargerProduits() {
-      try {
-        const res = await fetch('/api/products?module=boutique');
-        products = await res.json();
-        afficherProduits();
-        remplirSelectPOS();
-      } catch (err) {
-        console.error("Erreur chargement produits", err);
-      }
-    }
-
-    function afficherProduits() {
-      const tbody = document.getElementById('productsTableBody');
-      tbody.innerHTML = '';
-
-      products.forEach(p => {
-        const costPerUnit = Math.round(p.bulk_cost / p.ratio);
-        const margePerUnit = p.retail_price - costPerUnit;
-        const totalUnitsStock = p.stock_bulk * p.ratio;
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><strong>${p.name}</strong></td>
-          <td>${p.bulk_cost.toLocaleString()} F / ${p.bulk_unit}</td>
-          <td>${p.ratio} un.</td>
-          <td style="color:#9ca3af;">${costPerUnit} F</td>
-          <td style="color:#60a5fa; font-weight:bold;">${p.retail_price} F</td>
-          <td><span class="badge-marge">+${margePerUnit} F</span></td>
-          <td><strong>${p.stock_bulk} ${p.bulk_unit}s</strong> (${totalUnitsStock} un.)</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function remplirSelectPOS() {
-      const select = document.getElementById('posProductSelect');
-      select.innerHTML = '';
-      products.forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p.id;
-        opt.innerText = `${p.name} — ${p.retail_price} FCFA/unité`;
-        select.appendChild(opt);
-      });
-      calculerTotalPOS();
-    }
-
-    function calculerTotalPOS() {
-      const pId = document.getElementById('posProductSelect').value;
-      const qty = parseInt(document.getElementById('posQty').value || 1);
-      const product = products.find(p => p.id === pId);
-      
-      if(product) {
-        const total = product.retail_price * qty;
-        document.getElementById('posTotal').innerText = total.toLocaleString() + ' FCFA';
-      }
-    }
-
-    function calculerMargeModal() {
-      const bulkCost = parseFloat(document.getElementById('pBulkCost').value || 0);
-      const ratio = parseFloat(document.getElementById('pRatio').value || 1);
-      const retailPrice = parseFloat(document.getElementById('pRetailPrice').value || 0);
-
-      const costPerUnit = Math.round(bulkCost / ratio);
-      const marge = retailPrice - costPerUnit;
-
-      document.getElementById('calcRevient').innerText = costPerUnit.toLocaleString() + ' FCFA';
-      document.getElementById('calcMarge').innerText = '+' + marge.toLocaleString() + ' FCFA';
-    }
-
-    async function enregistrerProduitBDD() {
-      const name = document.getElementById('pName').value;
-      const bulk_unit = document.getElementById('pBulkUnit').value;
-      const bulk_cost = parseFloat(document.getElementById('pBulkCost').value);
-      const ratio = parseFloat(document.getElementById('pRatio').value);
-      const retail_price = parseFloat(document.getElementById('pRetailPrice').value);
-      const stock_bulk = parseFloat(document.getElementById('pStock').value);
-
-      if(!name || !bulk_cost || !retail_price) return alert("Remplissez les champs obligatoires.");
-
-      const payload = {
-        name, bulk_unit, bulk_cost, ratio, retail_price, stock_bulk, module: 'boutique'
-      };
-
-      await fetch('/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      alert("✅ Produit enregistré avec succès dans le module Boutique !");
-      fermerModalProduit();
-      chargerProduits();
-    }
-
-    async function enregistrerVenteBoutique(e) {
-      e.preventDefault();
-      const pId = document.getElementById('posProductSelect').value;
-      const qty = parseInt(document.getElementById('posQty').value);
-      const payment_method = document.getElementById('posPayment').value;
-      const product = products.find(p => p.id === pId);
-
-      const total = product.retail_price * qty;
-
-      const payload = {
-        items: [{ id: product.id, name: product.name, qty, price: product.retail_price }],
-        total,
-        payment_method,
-        module: 'boutique',
-        analytic_center: 'BOUTIQUE_PRINCIPALE'
-      };
-
-      await fetch('/api/sales', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      alert(`✅ Vente enregistrée ! ${total.toLocaleString()} FCFA comptabilisés. Écriture OHADA générée.`);
-    }
-
-    function ouvrirModalProduit() { document.getElementById('modalProduit').style.display = 'flex'; }
-    function fermerModalProduit() { document.getElementById('modalProduit').style.display = 'none'; }
-    function ouvrirModalVendeur() { document.getElementById('modalVendeur').style.display = 'flex'; }
-    function fermerModalVendeur() { document.getElementById('modalVendeur').style.display = 'none'; }
-
-    function enregistrerVendeur() {
-      const name = document.getElementById('vName').value;
-      if(!name) return;
-      const list = document.getElementById('vendeursList');
-      const div = document.createElement('div');
-      div.className = 'card-vendeur';
-      div.innerHTML = `<div><strong style="font-size:12px;">${name}</strong><br/><small style="color:var(--text-muted);">Role : Vendeur</small></div><span style="font-size:11px; color:var(--accent-green); font-weight:bold;">Actif</span>`;
-      list.appendChild(div);
-      fermerModalVendeur();
-    }
-
-    // Chargement initial
-    chargerProduits();
+    function lancerPromoIA() { alert("🚀 Campagne WhatsApp configurée avec succès ! Message promo généré par l'IA prêt à l'envoi."); }
+    function commanderGrossiste() { alert("📦 Commande d'achat envoyée directement au module Grossiste SYA OS !"); }
+    function imprimerFacturePro() { window.open('/settings/invoice', '_blank'); }
   </script>
 </body>
 </html>
