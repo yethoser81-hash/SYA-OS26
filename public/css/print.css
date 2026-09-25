@@ -1,0 +1,46 @@
+/* Style d'impression adaptatif */
+@media screen {
+  .sya-printable-receipt {
+    background: white;
+    color: black;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    font-family: monospace;
+    font-size: 12px;
+  }
+}
+
+.format-58mm {
+  width: 58mm;
+  margin: 0 auto;
+}
+
+.format-80mm {
+  width: 80mm;
+  margin: 0 auto;
+}
+
+.format-A4 {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 20mm;
+  background: white;
+  color: black;
+  font-family: system-ui, sans-serif;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .sya-printable-receipt, .sya-printable-receipt * {
+    visibility: visible;
+  }
+  .sya-printable-receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}

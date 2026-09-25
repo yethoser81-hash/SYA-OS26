@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SYA OS — Operating System pour Entreprises</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg-overlay: rgba(241, 245, 249, 0.65); 
+      --card-bg: rgba(15, 23, 42, 0.88); 
+      --card-border: rgba(255, 255, 255, 0.12);
+      --text-light: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), 
+                  url('../public/images/background.PNG') no-repeat center center fixed;
+      background-size: cover;
+      color: var(--text-light);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .portal {
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .portal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 25px;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-mark {
+      background: var(--primary);
+      color: white;
+      font-weight: 900;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 18px;
+    }
+
+    .brand-text strong {
+      display: block;
+      font-size: 15px;
+      color: #ffffff;
+    }
+
+    .brand-text span {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .system-status {
+      font-size: 12px;
+      font-weight: 600;
+      color: #34d399;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .portal-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 0;
+    }
+
+    .hero {
+      width: 100%;
+      max-width: 850px;
+      text-align: center;
+    }
+
+    .hero-kicker {
+      font-size: 11px;
+      font-weight: 800;
+      color: #1d4ed8;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      background: rgba(255, 255, 255, 0.85);
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .hero h1 {
+      font-size: 36px;
+      font-weight: 900;
+      color: #0f172a;
+      margin-bottom: 10px;
+    }
+
+    .hero h1 span {
+      color: var(--primary);
+    }
+
+    .hero p {
+      color: #334155;
+      font-size: 14px;
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+
+    /* Grille des Modules */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 15px;
+      text-align: left;
+      margin-bottom: 25px;
+    }
+
+    .module-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .module-card:hover {
+      border-color: #60a5fa;
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Effet bleu soutenu et distinct pour le module sélectionné */
+    .module-card.active {
+      background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+      border: 2px solid #93c5fd;
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.45);
+      transform: translateY(-3px);
+    }
+
+    .module-card.active .module-desc {
+      color: #e2e8f0;
+    }
+
+    .module-icon {
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    .module-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .module-desc {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Boîte d'action */
+    .action-box {
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .action-info {
+      text-align: left;
+    }
+
+    .action-info label {
+      font-size: 10px;
+      font-weight: 800;
+      color: #60a5fa;
+      letter-spacing: 0.5px;
+    }
+
+    .action-info h2 {
+      font-size: 18px;
+      color: #ffffff;
+      margin-top: 2px;
+    }
+
+    .btn-launch {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-launch:hover {
+      background: var(--primary-hover);
+    }
+
+    .portal-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #0f172a;
+      padding-top: 20px;
+      border-top: 1px solid rgba(15, 23, 42, 0.15);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="portal">
+    <header class="portal-header">
+      <a href="/" class="brand">
+        <div class="brand-mark">SYA</div>
+        <div class="brand-text">
+          <strong>SYA OS Core</strong>
+          <span>Business Operating System v1.0</span>
+        </div>
+      </a>
+      <div class="system-status">● Système En Ligne</div>
+    </header>
+
+    <main class="portal-main">
+      <div class="hero">
+        <span class="hero-kicker">SECTEUR D'ACTIVITÉ</span>
+        <h1>Sélectionnez votre <span>Espace Métier</span></h1>
+        <p>Choisissez votre domaine d'activité pour charger la configuration et le tableau de bord appropriés.</p>
+
+        <div class="modules-grid">
+          
+          <!-- 1. Boutique & Commerce -->
+          <div class="module-card active" onclick="selectModule('boutique', 'Boutique & Commerce de Détail', this)">
+            <div class="module-icon">🛍️</div>
+            <div>
+              <div class="module-title">Boutique & Détail</div>
+              <div class="module-desc">Vente comptoir rapide, gestion des articles et encaissement direct.</div>
+            </div>
+          </div>
+
+          <!-- 2. Supermarché & Libre-service -->
+          <div class="module-card" onclick="selectModule('supermarket', 'Supermarché & Libre-service', this)">
+            <div class="module-icon">🛒</div>
+            <div>
+              <div class="module-title">Supermarché</div>
+              <div class="module-desc">Caisse rapide, codes-barres, rayons et QR Code sécurité sortie.</div>
+            </div>
+          </div>
+
+          <!-- 3. Commerce de Gros -->
+          <div class="module-card" onclick="selectModule('wholesale', 'Commerce de Gros & Semi-Gros', this)">
+            <div class="module-icon">📦</div>
+            <div>
+              <div class="module-title">Gros & Semi-Gros</div>
+              <div class="module-desc">Gestion des sacs/cartons, conversion unités et factures A4.</div>
+            </div>
+          </div>
+
+          <!-- 4. Microfinance & Tontine -->
+          <div class="module-card" onclick="selectModule('microfinance', 'Microfinance & Épargne / Tontine', this)">
+            <div class="module-icon">🏦</div>
+            <div>
+              <div class="module-title">Microfinance & Tontine</div>
+              <div class="module-desc">Épargne, crédits, suivi des membres et écritures comptables.</div>
+            </div>
+          </div>
+
+          <!-- 5. Restaurant, Bar & Snack -->
+          <div class="module-card" onclick="selectModule('restaurant', 'Restaurant, Bar & Snack', this)">
+            <div class="module-icon">🍽️</div>
+            <div>
+              <div class="module-title">Restaurant & Bar</div>
+              <div class="module-desc">Prise de commande table, envois en cuisine et suivi du bar.</div>
+            </div>
+          </div>
+
+          <!-- 6. Pharmacie & Dépôt -->
+          <div class="module-card" onclick="selectModule('pharmacy', 'Pharmacie & Dépôt Médical', this)">
+            <div class="module-icon">💊</div>
+            <div>
+              <div class="module-title">Pharmacie & Médical</div>
+              <div class="module-desc">Péremptions, lots, ordonnances et stocks de sécurité.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="action-box">
+          <div class="action-info">
+            <label>MODULE SÉLECTIONNÉ</label>
+            <h2 id="selectedTitle">Boutique & Commerce de Détail</h2>
+          </div>
+          <button class="btn-launch" id="btnLaunch" onclick="launchApp()">Accéder à l'Espace →</button>
+        </div>
+
+      </div>
+    </main>
+
+    <footer class="portal-footer">
+      <span>SYA OS © 2026 — Yemga et Fils</span>
+      <div>
+        <a href="/security" style="color: #1d4ed8; text-decoration: none; margin-right: 15px;">🛡️ Contrôle Gardien</a>
+        <a href="/settings/invoice" style="color: #1d4ed8; text-decoration: none;">⚙️ Paramètres Impression</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    let currentModule = 'boutique';
+
+    function selectModule(key, title, el) {
+      currentModule = key;
+      document.getElementById('selectedTitle').innerText = title;
+
+      const cards = document.querySelectorAll('.module-card');
+      cards.forEach(card => card.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function launchApp() {
+      window.location.href = '/dashboard?module=' + currentModule;
+    }
+  </script>
+</body>
+</html>

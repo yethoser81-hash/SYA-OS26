@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SYA OS — Configuration Factures</title>
+  <style>
+    body { background-color: #0b0f19; color: white; font-family: system-ui, sans-serif; padding: 20px; }
+    .container { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; }
+    h2 { font-size: 16px; color: #38bdf8; margin-bottom: 15px; }
+    label { font-size: 12px; color: #94a3b8; display: block; margin-top: 10px; }
+    input, textarea, select { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white; box-sizing: border-box; font-size: 13px; }
+    button { background: #2563eb; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; width: 100%; margin-top: 15px; cursor: pointer; }
+    .btn-back { display: inline-block; color: #60a5fa; text-decoration: none; margin-bottom: 15px; font-size: 13px; }
+  </style>
+</head>
+<body>
+
+  <a href="/" class="btn-back">← Retour au Portail</a>
+
+  <div class="container">
+    <div class="card">
+      <h2>Paramètres Entreprise & Ticket</h2>
+      <form id="cfgForm">
+        <label>Nom de l'Etablissement</label>
+        <input type="text" id="companyName" value="SUPERMARCHÉ SYA OS" required />
+
+        <label>Sous-titre / Activité</label>
+        <input type="text" id="companyHeader" value="Alimentation Générale & Distribution" />
+
+        <label>NIU / Registre</label>
+        <input type="text" id="companyTaxId" value="M081912345678A" />
+
+        <label>Téléphone</label>
+        <input type="text" id="companyPhone" value="+237 600 00 00 00" />
+
+        <label>Format Imprimante</label>
+        <select id="printFormat">
+          <option value="58mm">Ticket Thermique 58mm</option>
+          <option value="80mm" selected>Ticket Thermique 80mm</option>
+          <option value="A4">Facture Standard A4</option>
+        </select>
+
+        <label>Pied de Page</label>
+        <textarea id="footerText" rows="3">Les marchandises vendues ne sont ni reprises ni échangées. Merci !</textarea>
+
+        <button type="submit">Enregistrer les Paramètres</button>
+      </form>
+    </div>
+
+    <div class="card" style="background: white; color: black; font-family: monospace;">
+      <h2 style="color: black; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Aperçu du Ticket</h2>
+      <div id="prevName" style="text-align:center; font-weight:bold; font-size:14px;">SUPERMARCHÉ SYA OS</div>
+      <div id="prevHeader" style="text-align:center; font-size:11px;">Alimentation Générale & Distribution</div>
+      <div id="prevTax" style="text-align:center; font-size:10px;">NIU: M081912345678A | Tél: +237 600 00 00 00</div>
+      <hr style="border:0; border-top:1px dashed #000; margin:10px 0;" />
+      <div style="display:flex; justify-content:space-between; font-size:11px;">
+        <span>Art: Riz Parfumé 50kg</span>
+        <span>22 000 FCFA</span>
+      </div>
+      <hr style="border:0; border-top:1px dashed #000; margin:10px 0;" />
+      <div style="text-align:center;">
+        <div style="width:60px; height:60px; background:#000; color:white; margin:0 auto; font-size:8px; display:flex; align-items:center; justify-content:center;">[ QR CODE ]</div>
+        <small style="font-size:9px;">Sécurité Sortie</small>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('cfgForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const config = {
+        name: document.getElementById('companyName').value,
+        header: document.getElementById('companyHeader').value,
+        taxId: document.getElementById('companyTaxId').value,
+        phone: document.getElementById('companyPhone').value,
+        format: document.getElementById('printFormat').value,
+        footer: document.getElementById('footerText').value
+      };
+      localStorage.setItem('sya_invoice_config', JSON.stringify(config));
+      alert('Configuration enregistrée !');
+    });
+  </script>
+</body>
+</html>

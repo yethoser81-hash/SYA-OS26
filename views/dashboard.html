@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SYA OS — Dashboard POS</title>
+  <link rel="stylesheet" href="/css/portal.css" />
+  <link rel="stylesheet" href="/css/print.css" />
+  <style>
+    body { background-color: #0b0f19; color: white; display: flex; flex-direction: column; min-height: 100vh; font-family: system-ui, sans-serif; }
+    .dash-header { background: #1e293b; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+    .dash-container { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; padding: 15px; flex: 1; }
+    .card { background: #1e293b; border-radius: 12px; padding: 15px; border: 1px solid #334155; }
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 15px; }
+    .product-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px; cursor: pointer; text-align: center; transition: transform 0.1s; }
+    .product-card:hover { border-color: #2563eb; transform: translateY(-2px); }
+    .product-card strong { display: block; font-size: 13px; color: white; margin-bottom: 5px; }
+    .product-card span { font-size: 12px; color: #38bdf8; font-weight: bold; }
+    .cart-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+    .cart-table th { text-align: left; color: #94a3b8; border-bottom: 1px solid #334155; padding-bottom: 5px; }
+    .cart-table td { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .total-box { font-size: 20px; font-weight: bold; color: #34d399; text-align: right; margin-top: 15px; border-top: 1px dashed #334155; padding-top: 10px; }
+    .btn-checkout { background: #10b981; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; width: 100%; margin-top: 15px; cursor: pointer; font-size: 15px; }
+    .btn-checkout:hover { background: #059669; }
+    input, select { background: #0f172a; border: 1px solid #475569; color: white; padding: 8px; border-radius: 6px; width: 100%; box-sizing: border-box; }
+  </style>
+</head>
+<body>
+
+  <header class="dash-header">
+    <div style="display: flex; align-items: center; gap: 15px;">
+      <a href="/" style="color: white; text-decoration: none; font-weight: bold; font-size: 18px;">SYA OS</a>
+      <span id="moduleBadge" style="background: #2563eb; font-size: 11px; padding: 3px 8px; border-radius: 12px;">Mode: Caisse</span>
+    </div>
+    <div>
+      <a href="/security" style="color: #38bdf8; text-decoration: none; font-size: 13px; margin-right: 15px;">🛡️ Ecran Gardien</a>
+      <a href="/settings/invoice" style="color: #94a3b8; text-decoration: none; font-size: 13px;">⚙️ Configuration</a>
+    </div>
+  </header>
+
+  <div class="dash-container">
+    
+    <!-- Zone Catalogue Produits -->
+    <div class="card">
+      <div style="display: flex; gap: 10px;">
+        <input type="text" id="searchProd" placeholder="Rechercher un produit ou scanner code-barres..." />
+        <select id="catFilter" style="width: 150px;">
+          <option value="ALL">Toutes catégories</option>
+          <option value="Alimentation">Alimentation</option>
+          <option value="Entretien">Entretien</option>
+        </select>
+      </div>
+
+      <div class="product-grid" id="productGrid">
+        <!-- Rempli dynamiquement -->
+      </div>
+    </div>
+
+    <!-- Zone Panier & Encaissement -->
+    <div class="card" style="display: flex; flex-direction: column;">
+      <h2 style="font-size: 15px; color: #38bdf8; margin-bottom: 10px;">🛒 Panier Caisse</h2>
+      
+      <div style="flex: 1; overflow-y: auto;">
+        <table class="cart-table">
+          <thead>
+            <tr>
+              <th>Article</th>
+              <th style="text-align: center;">Qté</th>
+              <th style="text-align: right;">Total</th>
+            </tr>
+          </thead>
+          <tbody id="cartItems">
+            <tr>
+              <td colspan="3" style="text-align: center; color: #64748b; padding: 20px 0;">Panier vide</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <div style="margin-top: 10px;">
+          <label style="font-size: 11px; color: #94a3b8;">Mode de Règlement</label>
+          <select id="paymentMethod" style="margin-top: 4px;">
+            <option value="CASH">Espèces (Caisse 571100)</option>
+            <option value="MOBILE_MONEY">Mobile Money / Orange Money (521100)</option>
+          </select>
+        </div>
+
+        <div class="total-box">
+          TOTAL: <span id="cartTotal">0</span> FCFA
+        </div>
+
+        <button class="btn-checkout" id="btnPay">VALIDER ET IMPRIMER</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/js/printer-engine.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
