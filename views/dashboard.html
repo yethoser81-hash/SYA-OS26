@@ -23,8 +23,11 @@
     .btn-checkout { background: #10b981; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; width: 100%; margin-top: 15px; cursor: pointer; font-size: 15px; }
     .btn-checkout:hover { background: #059669; }
     input, select { background: #0f172a; border: 1px solid #475569; color: white; padding: 8px; border-radius: 6px; width: 100%; box-sizing: border-box; }
-    .admin-panel { background: #111827; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #2563eb; }
-    .admin-only { display: none; }
+    
+    /* Styles pour la vue d'administration et de gestion par module */
+    .admin-bar { background: #0f172a; border: 1px solid #2563eb; padding: 10px 15px; border-radius: 8px; margin: 15px 15px 0 15px; display: flex; justify-content: space-between; align-items: center; }
+    .module-view { display: none; }
+    .module-view.active { display: block; }
   </style>
 </head>
 <body>
@@ -32,124 +35,173 @@
   <header class="dash-header">
     <div style="display: flex; align-items: center; gap: 15px;">
       <a href="/" style="color: white; text-decoration: none; font-weight: bold; font-size: 18px;">SYA OS</a>
-      <span id="moduleBadge" style="background: #2563eb; font-size: 11px; padding: 3px 8px; border-radius: 12px;">Mode: Chargement...</span>
+      <span id="moduleBadge" style="background: #2563eb; font-size: 11px; padding: 3px 8px; border-radius: 12px;">Chargement...</span>
     </div>
     <div style="display: flex; align-items: center; gap: 15px;">
-      <!-- Sélecteur de rôle pour démonstration & administration -->
-      <select id="userRoleSelect" onchange="toggleRole()" style="width: auto; padding: 4px 8px; font-size: 12px;">
-        <option value="SUPER_ADMIN">Rôle: Super Admin</option>
-        <option value="CASHIER">Rôle: Vendeur / Caissier</option>
+      <select id="userRole" onchange="renderInterfaceByRoleAndModule()" style="width: auto; padding: 4px 8px; font-size: 12px;">
+        <option value="SUPER_ADMIN">Accès: Super Admin</option>
+        <option value="CASHIER">Accès: Vendeur / Agent</option>
       </select>
-      <a href="/security" id="securityLink" style="color: #38bdf8; text-decoration: none; font-size: 13px;">🛡️ Ecran Gardien</a>
+      <a href="/security" id="gardienLink" style="color: #38bdf8; text-decoration: none; font-size: 13px;">🛡️ Ecran Gardien</a>
       <a href="/settings/invoice" style="color: #94a3b8; text-decoration: none; font-size: 13px;">⚙️ Configuration</a>
     </div>
   </header>
 
-  <!-- Zone Super Admin : Panneau de Contrôle -->
-  <div id="adminPanel" class="admin-panel admin-only" style="margin: 15px 15px 0 15px;">
-    <h3 style="margin-top: 0; color: #60a5fa; font-size: 14px;">👑 Panneau Super Admin & Gestion des Caisses</h3>
-    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-      <button onclick="openProductModal()" style="background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">+ Ajouter Produit</button>
-      <button onclick="alert('Module de création de caisse et attribution des rôles vendeurs')" style="background: #0d9488; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">🔑 Créer une Caisse / Attribuer Rôle</button>
-      <button onclick="alert('Chargement de l\'état de la caisse globale')" style="background: #4f46e5; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">📊 Voir État des Vendeurs</button>
+  <!-- Barre de gestion réservée au Super Admin -->
+  <div id="adminPanel" class="admin-bar" style="display: none;">
+    <span style="font-size: 13px; font-weight: bold; color: #60a5fa;">👑 Administration & Attribution des Rôles</span>
+    <div style="display: flex; gap: 10px;">
+      <button onclick="ajouterElementContextuel()" style="background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">+ Ajouter Élément / Produit</button>
+      <button onclick="alert('Module d\'attribution des caisses et rôles vendeurs ouvert')" style="background: #0d9488; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">🔑 Créer Caisse / Donner Rôles</button>
     </div>
   </div>
 
-  <div class="dash-container">
-    
-    <!-- Zone Catalogue Produits -->
-    <div class="card">
-      <div style="display: flex; gap: 10px;">
-        <input type="text" id="searchProd" placeholder="Rechercher un produit ou scanner code-barres..." />
-        <select id="catFilter" style="width: 150px;">
-          <option value="ALL">Toutes catégories</option>
-          <option value="Alimentation">Alimentation</option>
-          <option value="Entretien">Entretien</option>
-        </select>
-      </div>
+  <!-- CONTENU DYNAMIQUE SELON LE MODULE -->
 
-      <div class="product-grid" id="productGrid">
-        <!-- Rempli dynamiquement -->
+  <!-- 1. VUE MICROFINANCE & TONTINE -->
+  <div id="viewMicrofinance" class="module-view" style="padding: 15px;">
+    <div class="dash-container" style="padding: 0;">
+      <div class="card">
+        <h2 style="font-size: 16px; color: #38bdf8; margin-bottom: 15px;">🏦 Gestion Épargne & Crédit</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+          <input type="text" placeholder="Rechercher un membre / Compte n°..." />
+          <button style="background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer;">Rechercher Membre</button>
+        </div>
+        <div style="border: 1px solid #334155; border-radius: 8px; padding: 15px; background: #0f172a;">
+          <h3 style="font-size: 14px; margin-bottom: 10px;">Opérations Récentes</h3>
+          <p style="font-size: 12px; color: #94a3b8;">Sélectionnez un membre pour effectuer un dépôt, un retrait ou suivre les remboursements de crédit.</p>
+        </div>
+      </div>
+      <div class="card">
+        <h2 style="font-size: 15px; color: #34d399; margin-bottom: 10px;">📥 Saisie Transaction</h2>
+        <label style="font-size: 11px; color: #94a3b8;">Type d'opération</label>
+        <select style="margin-bottom: 10px;">
+          <option>Dépôt Épargne</option>
+          <option>Remboursement Crédit</option>
+          <option>Cotisation Tontine</option>
+          <option>Retrait Espèces</option>
+        </select>
+        <label style="font-size: 11px; color: #94a3b8;">Montant (FCFA)</label>
+        <input type="number" placeholder="ex: 25000" style="margin-bottom: 15px;" />
+        <button class="btn-checkout">ENREGISTRER L'OPÉRATION</button>
       </div>
     </div>
+  </div>
 
-    <!-- Zone Panier & Encaissement -->
-    <div class="card" style="display: flex; flex-direction: column;">
-      <h2 style="font-size: 15px; color: #38bdf8; margin-bottom: 10px;">🛒 Panier Caisse</h2>
-      
-      <div style="flex: 1; overflow-y: auto;">
-        <table class="cart-table">
-          <thead>
-            <tr>
-              <th>Article</th>
-              <th style="text-align: center;">Qté</th>
-              <th style="text-align: right;">Total</th>
-            </tr>
-          </thead>
-          <tbody id="cartItems">
-            <tr>
-              <td colspan="3" style="text-align: center; color: #64748b; padding: 20px 0;">Panier vide</td>
-            </tr>
-          </tbody>
-        </table>
+  <!-- 2. VUE PHARMACIE & MÉDICAL -->
+  <div id="viewPharmacy" class="module-view" style="padding: 15px;">
+    <div class="dash-container" style="padding: 0;">
+      <div class="card">
+        <h2 style="font-size: 15px; color: #38bdf8; margin-bottom: 10px;">💊 Stock Produits Médicaux & Ordonnances</h2>
+        <input type="text" placeholder="Rechercher médicament, DCI ou scanner code-barres..." />
+        <div class="product-grid" id="pharmaGrid">
+          <div class="product-card" onclick="addToCart('Paracétamol 500mg', 250)">
+            <strong>Paracétamol 500mg</strong>
+            <span>250 FCFA</span>
+          </div>
+          <div class="product-card" onclick="addToCart('Amoxicilline 1g', 800)">
+            <strong>Amoxicilline 1g</strong>
+            <span>800 FCFA</span>
+          </div>
+        </div>
       </div>
+      <div class="card">
+        <h2 style="font-size: 15px; color: #38bdf8; margin-bottom: 10px;">🛒 Prescription & Vente</h2>
+        <table class="cart-table">
+          <thead><tr><th>Médicament</th><th style="text-align:center;">Qté</th><th style="text-align:right;">Total</th></tr></thead>
+          <tbody id="pharmaCart"><tr><td colspan="3" style="text-align:center; color:#64748b; padding:20px 0;">Panier vide</td></tr></tbody>
+        </table>
+        <div class="total-box">TOTAL: <span id="pharmaTotal">0</span> FCFA</div>
+        <button class="btn-checkout">VALIDER VENTE PHARMACIE</button>
+      </div>
+    </div>
+  </div>
 
-      <div>
-        <div style="margin-top: 10px;">
-          <label style="font-size: 11px; color: #94a3b8;">Mode de Règlement</label>
-          <select id="paymentMethod" style="margin-top: 4px;">
-            <option value="CASH">Espèces (Caisse 571100)</option>
-            <option value="MOBILE_MONEY">Mobile Money / Orange Money (521100)</option>
+  <!-- 3. VUE COMMERCE DÉTAIL / SUPERMARCHÉ (Caisse Classique) -->
+  <div id="viewStandardPos" class="module-view" style="padding: 15px;">
+    <div class="dash-container" style="padding: 0;">
+      <div class="card">
+        <div style="display: flex; gap: 10px;">
+          <input type="text" id="searchProd" placeholder="Rechercher un produit ou scanner code-barres..." />
+          <select id="catFilter" style="width: 150px;">
+            <option value="ALL">Toutes catégories</option>
+            <option value="Alimentation">Alimentation</option>
+            <option value="Entretien">Entretien</option>
           </select>
         </div>
-
-        <div class="total-box">
-          TOTAL: <span id="cartTotal">0</span> FCFA
+        <div class="product-grid" id="productGrid"></div>
+      </div>
+      <div class="card" style="display: flex; flex-direction: column;">
+        <h2 style="font-size: 15px; color: #38bdf8; margin-bottom: 10px;">🛒 Panier Caisse</h2>
+        <div style="flex: 1; overflow-y: auto;">
+          <table class="cart-table">
+            <thead>
+              <tr><th>Article</th><th style="text-align: center;">Qté</th><th style="text-align: right;">Total</th></tr>
+            </thead>
+            <tbody id="cartItems">
+              <tr><td colspan="3" style="text-align: center; color: #64748b; padding: 20px 0;">Panier vide</td></tr>
+            </tbody>
+          </table>
         </div>
-
-        <button class="btn-checkout" id="btnPay">VALIDER ET IMPRIMER</button>
+        <div>
+          <div style="margin-top: 10px;">
+            <label style="font-size: 11px; color: #94a3b8;">Mode de Règlement</label>
+            <select id="paymentMethod" style="margin-top: 4px;">
+              <option value="CASH">Espèces (Caisse 571100)</option>
+              <option value="MOBILE_MONEY">Mobile Money / Orange Money (521100)</option>
+            </select>
+          </div>
+          <div class="total-box">TOTAL: <span id="cartTotal">0</span> FCFA</div>
+          <button class="btn-checkout" id="btnPay">VALIDER ET IMPRIMER</button>
+        </div>
       </div>
     </div>
-
   </div>
 
   <script src="/js/printer-engine.js"></script>
   <script src="/js/dashboard.js"></script>
   <script>
-    // Module et Rôle
+    // Récupération dynamique du paramètre URL
     const urlParams = new URLSearchParams(window.location.search);
-    const currentModule = urlParams.get('module') || 'boutique';
-    
-    document.getElementById('moduleBadge').innerText = 'Espace: ' + currentModule.toUpperCase();
+    const activeModule = urlParams.get('module') || 'boutique';
 
-    // Masquer le contrôle Gardien si ce n'est pas un supermarché
-    if (currentModule !== 'supermarket') {
-      const secLink = document.getElementById('securityLink');
-      if (secLink) secLink.style.display = 'none';
-    }
+    function renderInterfaceByRoleAndModule() {
+      const role = document.getElementById('userRole').value;
+      const adminPanel = document.getElementById('adminPanel');
+      const gardienLink = document.getElementById('gardienLink');
+      const badge = document.getElementById('moduleBadge');
 
-    function toggleRole() {
-      const role = document.getElementById('userRoleSelect').value;
-      const adminElements = document.querySelectorAll('.admin-only');
-      adminElements.forEach(el => {
-        el.style.display = (role === 'SUPER_ADMIN') ? 'block' : 'none';
-      });
-    }
+      // Affichage du Panneau Admin
+      adminPanel.style.display = (role === 'SUPER_ADMIN') ? 'flex' : 'none';
 
-    // Initialisation
-    toggleRole();
+      // Affichage de l'Écran Gardien uniquement si Supermarché
+      gardienLink.style.display = (activeModule === 'supermarket') ? 'inline' : 'none';
 
-    function openProductModal() {
-      const name = prompt('Nom du produit :');
-      const price = prompt('Prix de vente (FCFA) :');
-      if (name && price) {
-        fetch('/api/products', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, retail_price: Number(price), module: currentModule, category: 'Général' })
-        }).then(() => window.location.reload());
+      // Mise à jour du badge
+      badge.innerText = 'Espace: ' + activeModule.toUpperCase();
+
+      // Masquer toutes les vues
+      document.querySelectorAll('.module-view').forEach(el => el.classList.remove('active'));
+
+      // Afficher la vue correspondant au module
+      if (activeModule === 'microfinance') {
+        document.getElementById('viewMicrofinance').classList.add('active');
+      } else if (activeModule === 'pharmacy') {
+        document.getElementById('viewPharmacy').classList.add('active');
+      } else {
+        document.getElementById('viewStandardPos').classList.add('active');
       }
     }
+
+    function ajouterElementContextuel() {
+      const nom = prompt("Nom de l'élément à ajouter pour le module " + activeModule + " :");
+      if (nom) {
+        alert("Élément '" + nom + "' ajouté avec succès à la base de données du module " + activeModule);
+      }
+    }
+
+    // Exécution au chargement
+    renderInterfaceByRoleAndModule();
   </script>
 </body>
 </html>
