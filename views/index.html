@@ -8,7 +8,7 @@
     :root {
       --primary: #2563eb;
       --primary-hover: #1d4ed8;
-      --bg-overlay: rgba(241, 245, 249, 0.65); 
+      --bg-overlay: rgba(15, 23, 42, 0.75); 
       --card-bg: rgba(15, 23, 42, 0.88); 
       --card-border: rgba(255, 255, 255, 0.12);
       --text-light: #f8fafc;
@@ -24,8 +24,9 @@
 
     body {
       min-height: 100vh;
+      /* Correction du chemin d'image pour le serveur Render */
       background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), 
-                  url('../public/images/background.png') no-repeat center center fixed;
+                  url('/images/background.png') no-repeat center center fixed;
       background-size: cover;
       color: var(--text-light);
       display: flex;
@@ -111,7 +112,7 @@
       color: #1d4ed8;
       letter-spacing: 1px;
       margin-bottom: 12px;
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.92);
       display: inline-block;
       padding: 5px 14px;
       border-radius: 20px;
@@ -121,19 +122,20 @@
     .hero h1 {
       font-size: 36px;
       font-weight: 900;
-      color: #0f172a;
+      color: #ffffff;
       margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
 
     .hero h1 span {
-      color: var(--primary);
+      color: #60a5fa;
     }
 
     .hero p {
-      color: #334155;
+      color: #cbd5e1;
       font-size: 14px;
       margin-bottom: 25px;
-      font-weight: 600;
+      font-weight: 500;
     }
 
     /* Grille des Modules */
@@ -234,22 +236,23 @@
       font-weight: 800;
       font-size: 14px;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.1s;
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
     }
 
     .btn-launch:hover {
       background: var(--primary-hover);
+      transform: scale(1.02);
     }
 
     .portal-footer {
       display: flex;
       justify-content: space-between;
       font-size: 12px;
-      color: #0f172a;
+      color: #cbd5e1;
       padding-top: 20px;
-      border-top: 1px solid rgba(15, 23, 42, 0.15);
-      font-weight: 700;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-weight: 600;
     }
   </style>
 </head>
@@ -345,26 +348,30 @@
     <footer class="portal-footer">
       <span>SYA OS © 2026 — Yemga et Fils</span>
       <div>
-        <a href="/security" style="color: #1d4ed8; text-decoration: none; margin-right: 15px;">🛡️ Contrôle Gardien</a>
-        <a href="/settings/invoice" style="color: #1d4ed8; text-decoration: none;">⚙️ Paramètres Impression</a>
+        <a href="/security" style="color: #60a5fa; text-decoration: none; margin-right: 15px;">🛡️ Contrôle Gardien</a>
+        <a href="/settings/invoice" style="color: #60a5fa; text-decoration: none;">⚙️ Paramètres Impression</a>
       </div>
     </footer>
   </div>
 
   <script>
-    let currentModule = 'boutique';
+    let currentModuleKey = 'boutique';
 
-    function selectModule(key, title, el) {
-      currentModule = key;
+    function selectModule(key, title, element) {
+      currentModuleKey = key;
       document.getElementById('selectedTitle').innerText = title;
 
+      // Retirer la classe active de toutes les cartes
       const cards = document.querySelectorAll('.module-card');
       cards.forEach(card => card.classList.remove('active'));
-      el.classList.add('active');
+
+      // Ajouter la classe active à la carte sélectionnée
+      element.classList.add('active');
     }
 
     function launchApp() {
-      window.location.href = '/dashboard?module=' + currentModule;
+      // Redirection dynamique vers le tableau de bord avec la clé du module choisi
+      window.location.href = '/dashboard?module=' + encodeURIComponent(currentModuleKey);
     }
   </script>
 </body>
