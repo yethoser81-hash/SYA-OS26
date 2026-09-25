@@ -36,18 +36,43 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', system: 'SYA OS Core', version: '1.0.0', timestamp: new Date() });
 });
 
-// Base de données temporaire en mémoire
+// Base de données utilisateurs et rôles
+let mockUsers = [
+    { id: 'usr_admin', name: 'Super Admin', role: 'SUPER_ADMIN', moduleAccess: 'ALL' },
+    { id: 'usr_cashier1', name: 'Vendeur Caisse 1', role: 'CASHIER', moduleAccess: 'boutique' },
+    { id: 'usr_pharma1', name: 'Vendeur Pharmacie', role: 'CASHIER', moduleAccess: 'pharmacy' }
+];
+
+// Base de données temporaire en mémoire par module
 let mockProducts = [
-    { id: 'p1', name: 'Riz Parfumé 50kg', category: 'Alimentation', bulk_unit: 'Sac', bulk_cost: 22000, ratio: 50, retail_price: 500, stock_bulk: 20 },
-    { id: 'p2', name: 'Huile Raffinée 1L', category: 'Alimentation', bulk_unit: 'Carton', bulk_cost: 18000, ratio: 15, retail_price: 1350, stock_bulk: 12 },
-    { id: 'p3', name: 'Savon de Ménage', category: 'Entretien', bulk_unit: 'Carton', bulk_cost: 12000, ratio: 24, retail_price: 600, stock_bulk: 8 }
+    { id: 'p1', name: 'Riz Parfumé 50kg', module: 'boutique', category: 'Alimentation', bulk_unit: 'Sac', bulk_cost: 22000, ratio: 50, retail_price: 500, stock_bulk: 20 },
+    { id: 'p2', name: 'Huile Raffinée 1L', module: 'boutique', category: 'Alimentation', bulk_unit: 'Carton', bulk_cost: 18000, ratio: 15, retail_price: 1350, stock_bulk: 12 },
+    { id: 'p3', name: 'Savon de Ménage', module: 'boutique', category: 'Entretien', bulk_unit: 'Carton', bulk_cost: 12000, ratio: 24, retail_price: 600, stock_bulk: 8 },
+    { id: 'med1', name: 'Paracétamol 500mg', module: 'pharmacy', category: 'Analgésique', bulk_unit: 'Boîte', bulk_cost: 1500, ratio: 10, retail_price: 250, stock_bulk: 50 },
+    { id: 'med2', name: 'Amoxicilline 1g', module: 'pharmacy', category: 'Antibiotique', bulk_unit: 'Boîte', bulk_cost: 4500, ratio: 8, retail_price: 800, stock_bulk: 30 }
 ];
 
 let mockSales = [];
 let mockAccountingEntries = [];
 
-// API Produits
+// API Utilisateurs (Administration)
+app.get('/api/users', (req, res) => {
+    res.json(mockUsers);
+});
+
+app.post('/api/users', (req, res) => {
+    const newUser = { id: 'usr_' + Date.now(), ...req.body };
+    mockUsers.push(newUser);
+    res.status(201).json(newUser);
+});
+
+// API Produits filtrés par module
 app.get('/api/products', (req, res) => {
+    const { module: moduleQuery } = req.query;
+    if (moduleQuery) {
+        const filtered = mockProducts.filter(p => p.module === moduleQuery || p.module === 'all');
+        return res.json(filtered);
+    }
     res.json(mockProducts);
 });
 
@@ -59,12 +84,14 @@ app.post('/api/products', (req, res) => {
 
 // API Ventes & Génération automatique d'écritures comptables
 app.post('/api/sales', (req, res) => {
-    const { items, total, payment_method, client_name, client_whatsapp, analytic_center } = req.body;
+    const { items, total, payment_method, client_name, client_whatsapp, analytic_center, cashier_id, module } = req.body;
 
     const ticketRef = 'TICK-' + Math.floor(100000 + Math.random() * 900000);
     const sale = {
         id: 'sale_' + Date.now(),
         ticket_ref: ticketRef,
+        module: module || 'boutique',
+        cashier_id: cashier_id || 'DEFAULT_CASHIER',
         items,
         total,
         payment_method: payment_method || 'CASH',
@@ -81,11 +108,11 @@ app.post('/api/sales', (req, res) => {
         id: 'ecr_' + Date.now(),
         date: new Date().toISOString(),
         ref: ticketRef,
-        libelle: `Vente Comptant - Ticket ${ticketRef}`,
+        libelle: `Vente ${module || 'Comptant'} - Ticket ${ticketRef}`,
         debit_account: payment_method === 'MOBILE_MONEY' ? '521100 (Banque/Mobile)' : '571100 (Caisse)',
         credit_account: '701100 (Ventes de marchandises)',
         amount: total,
-        analytic_center: analytic_center || 'GENERIC_STORE'
+        analytic_center: analytic_center || (module ? module.toUpperCase() : 'GENERIC_STORE')
     };
     mockAccountingEntries.unshift(journalEntry);
 

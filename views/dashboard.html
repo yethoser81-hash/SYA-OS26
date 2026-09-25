@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="/css/portal.css" />
   <link rel="stylesheet" href="/css/print.css" />
   <style>
-    body { background-color: #0b0f19; color: white; display: flex; flex-direction: column; min-height: 100vh; font-family: system-ui, sans-serif; }
+    body { background-color: #0b0f19; color: white; display: flex; flex-direction: column; min-height: 100vh; font-family: system-ui, sans-serif; margin: 0; }
     .dash-header { background: #1e293b; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
     .dash-container { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; padding: 15px; flex: 1; }
     .card { background: #1e293b; border-radius: 12px; padding: 15px; border: 1px solid #334155; }
@@ -23,6 +23,8 @@
     .btn-checkout { background: #10b981; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; width: 100%; margin-top: 15px; cursor: pointer; font-size: 15px; }
     .btn-checkout:hover { background: #059669; }
     input, select { background: #0f172a; border: 1px solid #475569; color: white; padding: 8px; border-radius: 6px; width: 100%; box-sizing: border-box; }
+    .admin-panel { background: #111827; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #2563eb; }
+    .admin-only { display: none; }
   </style>
 </head>
 <body>
@@ -30,13 +32,28 @@
   <header class="dash-header">
     <div style="display: flex; align-items: center; gap: 15px;">
       <a href="/" style="color: white; text-decoration: none; font-weight: bold; font-size: 18px;">SYA OS</a>
-      <span id="moduleBadge" style="background: #2563eb; font-size: 11px; padding: 3px 8px; border-radius: 12px;">Mode: Caisse</span>
+      <span id="moduleBadge" style="background: #2563eb; font-size: 11px; padding: 3px 8px; border-radius: 12px;">Mode: Chargement...</span>
     </div>
-    <div>
-      <a href="/security" style="color: #38bdf8; text-decoration: none; font-size: 13px; margin-right: 15px;">🛡️ Ecran Gardien</a>
+    <div style="display: flex; align-items: center; gap: 15px;">
+      <!-- Sélecteur de rôle pour démonstration & administration -->
+      <select id="userRoleSelect" onchange="toggleRole()" style="width: auto; padding: 4px 8px; font-size: 12px;">
+        <option value="SUPER_ADMIN">Rôle: Super Admin</option>
+        <option value="CASHIER">Rôle: Vendeur / Caissier</option>
+      </select>
+      <a href="/security" id="securityLink" style="color: #38bdf8; text-decoration: none; font-size: 13px;">🛡️ Ecran Gardien</a>
       <a href="/settings/invoice" style="color: #94a3b8; text-decoration: none; font-size: 13px;">⚙️ Configuration</a>
     </div>
   </header>
+
+  <!-- Zone Super Admin : Panneau de Contrôle -->
+  <div id="adminPanel" class="admin-panel admin-only" style="margin: 15px 15px 0 15px;">
+    <h3 style="margin-top: 0; color: #60a5fa; font-size: 14px;">👑 Panneau Super Admin & Gestion des Caisses</h3>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <button onclick="openProductModal()" style="background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">+ Ajouter Produit</button>
+      <button onclick="alert('Module de création de caisse et attribution des rôles vendeurs')" style="background: #0d9488; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">🔑 Créer une Caisse / Attribuer Rôle</button>
+      <button onclick="alert('Chargement de l\'état de la caisse globale')" style="background: #4f46e5; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">📊 Voir État des Vendeurs</button>
+    </div>
+  </div>
 
   <div class="dash-container">
     
@@ -98,5 +115,41 @@
 
   <script src="/js/printer-engine.js"></script>
   <script src="/js/dashboard.js"></script>
+  <script>
+    // Module et Rôle
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentModule = urlParams.get('module') || 'boutique';
+    
+    document.getElementById('moduleBadge').innerText = 'Espace: ' + currentModule.toUpperCase();
+
+    // Masquer le contrôle Gardien si ce n'est pas un supermarché
+    if (currentModule !== 'supermarket') {
+      const secLink = document.getElementById('securityLink');
+      if (secLink) secLink.style.display = 'none';
+    }
+
+    function toggleRole() {
+      const role = document.getElementById('userRoleSelect').value;
+      const adminElements = document.querySelectorAll('.admin-only');
+      adminElements.forEach(el => {
+        el.style.display = (role === 'SUPER_ADMIN') ? 'block' : 'none';
+      });
+    }
+
+    // Initialisation
+    toggleRole();
+
+    function openProductModal() {
+      const name = prompt('Nom du produit :');
+      const price = prompt('Prix de vente (FCFA) :');
+      if (name && price) {
+        fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, retail_price: Number(price), module: currentModule, category: 'Général' })
+        }).then(() => window.location.reload());
+      }
+    }
+  </script>
 </body>
 </html>
