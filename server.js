@@ -3,199 +3,213 @@ const path = require('path');
 const cors = require('cors');
 require('dotenv').config();
 
-// Importation des routes Microfinance & Tontines
-const microfinanceRoutes = require('./routes/microfinance');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middlewares
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Servir les fichiers statiques (Frontend)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Enregistrement des routes de Microfinance
-app.use('/', microfinanceRoutes);
+// --- BASE DE DONNÉES EN MÉMOIRE (STRUCTURE TYPE ODOO) ---
 
-// --- ROUTAGE MODULAIRE DES VUES HTML ---
-
-// Page d'accueil / Hub
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'index.html'));
-});
-
-// Routage dynamique selon le paramètre ?module=...
-app.get('/dashboard', (req, res) => {
-    const moduleQuery = req.query.module || 'boutique';
-
-    if (moduleQuery === 'microfinance' || moduleQuery === 'tontine') {
-        return res.sendFile(path.join(__dirname, 'views', 'microfinance.html'));
-    }
-
-    if (moduleQuery === 'boutique') {
-        return res.sendFile(path.join(__dirname, 'views', 'boutique.html'));
-    }
-
-    if (moduleQuery === 'grossiste' || moduleQuery === 'wholesale') {
-        return res.sendFile(path.join(__dirname, 'views', 'grossiste.html'));
-    }
-
-    if (moduleQuery === 'supermarche') {
-        return res.sendFile(path.join(__dirname, 'views', 'supermarche.html'));
-    }
-
-    if (moduleQuery === 'restaurant') {
-        return res.sendFile(path.join(__dirname, 'views', 'restaurant.html'));
-    }
-
-    if (moduleQuery === 'pharmacy' || moduleQuery === 'pharmacie') {
-        return res.sendFile(path.join(__dirname, 'views', 'pharmacie.html'));
-    }
-
-    // Vue par défaut
-    res.sendFile(path.join(__dirname, 'views', 'boutique.html'));
-});
-
-app.get('/security', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'security.html'));
-});
-
-app.get('/settings/invoice', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'settings-invoice.html'));
-});
-
-// --- API REST ---
-app.get('/api/health', (req, res) => {
-    res.json({ status: 'OK', system: 'SYA OS Core', version: '1.0.0', timestamp: new Date() });
-});
-
-// Base de données utilisateurs et rôles
-let mockUsers = [
-    { id: 'usr_admin', name: 'Super Admin', role: 'SUPER_ADMIN', moduleAccess: 'ALL' },
-    { id: 'usr_cashier1', name: 'Vendeur Caisse 1', role: 'CASHIER', moduleAccess: 'boutique' },
-    { id: 'usr_pharma1', name: 'Vendeur Pharmacie', role: 'CASHIER', moduleAccess: 'pharmacy' }
+let mockPOSConfigs = [
+    { id: 'pos_caisse_1', name: 'Caisse Principale 01', status: 'OPEN', activeSessionId: 'sess_101', cashier: 'Paul' },
+    { id: 'pos_caisse_2', name: 'Caisse Rayon Frais 02', status: 'CLOSED', activeSessionId: null, cashier: null }
 ];
 
-// Base de données temporaire en mémoire par module
+let mockSessions = [
+    { id: 'sess_101', pos_id: 'pos_caisse_1', opened_at: new Date().toISOString(), opening_balance: 50000, status: 'OPEN', total_sales: 0 }
+];
+
 let mockProducts = [
-    { id: 'p1', name: 'Riz Parfumé 50kg', module: 'boutique', category: 'Alimentation', bulk_unit: 'Sac', bulk_cost: 22000, ratio: 50, retail_price: 500, stock_bulk: 20 },
-    { id: 'p2', name: 'Huile Raffinée 1L', module: 'boutique', category: 'Alimentation', bulk_unit: 'Carton', bulk_cost: 18000, ratio: 15, retail_price: 1350, stock_bulk: 12 },
-    { id: 'p3', name: 'Savon de Ménage', module: 'boutique', category: 'Entretien', bulk_unit: 'Carton', bulk_cost: 12000, ratio: 24, retail_price: 600, stock_bulk: 8 },
-    { id: 'med1', name: 'Paracétamol 500mg', module: 'pharmacy', category: 'Analgésique', bulk_unit: 'Boîte', bulk_cost: 1500, ratio: 10, retail_price: 250, stock_bulk: 50 },
-    { id: 'med2', name: 'Amoxicilline 1g', module: 'pharmacy', category: 'Antibiotique', bulk_unit: 'Boîte', bulk_cost: 4500, ratio: 8, retail_price: 800, stock_bulk: 30 }
+    { id: 'p1', code: '376001', name: 'Riz Parfumé 50kg', category: 'Alimentation', cost_price: 22000, retail_price: 25000, stock_qty: 15, min_stock_alert: 10, daily_avg_sales: 3 },
+    { id: 'p2', code: '376002', name: 'Huile Raffinée 1L', category: 'Alimentation', cost_price: 1100, retail_price: 1350, stock_qty: 8, min_stock_alert: 20, daily_avg_sales: 5 },
+    { id: 'p3', code: '376003', name: 'Lait Concentré 1kg', category: 'Épicerie', cost_price: 650, retail_price: 800, stock_qty: 45, min_stock_alert: 15, daily_avg_sales: 4 }
 ];
 
 let mockSales = [];
 let mockAccountingEntries = [];
 
-// API Utilisateurs (Administration)
-app.get('/api/users', (req, res) => {
-    res.json(mockUsers);
+// --- MOTEUR IA PRÉDICTIF & SIMULATION NOTIFICATION WHATSAPP/SMS ---
+
+function analyserStocksEtAlertesIA() {
+    let alertesList = [];
+
+    mockProducts.forEach(prod => {
+        // Calcul du nombre de jours de stock restant
+        const joursRestants = prod.daily_avg_sales > 0 ? (prod.stock_qty / prod.daily_avg_sales).toFixed(1) : 999;
+
+        if (prod.stock_qty <= prod.min_stock_alert || joursRestants <= 3) {
+            const alerte = {
+                product_id: prod.id,
+                product_name: prod.name,
+                stock_actuel: prod.stock_qty,
+                jours_restants: joursRestants,
+                message: `⚠️ *Alerte Stock Prédictif* : '${prod.name}' épuisé dans ~${joursRestants} jours au rythme actuel. Stock actuel : ${prod.stock_qty} unités. Réapprovisionnement recommandé.`
+            };
+            alertesList.push(alerte);
+        }
+    });
+
+    return alertesList;
+}
+
+function envoyerNotificationWhatsAppAdmin(titre, corpsMsg) {
+    console.log(`\n================================================`);
+    console.log(`📲 [NOTIFICATION WA / SMS ENVOYÉE À L'ADMIN]`);
+    console.log(`📌 SUJET: ${titre}`);
+    console.log(`💬 MESSAGE:\n${corpsMsg}`);
+    console.log(`================================================\n`);
+}
+
+// --- ROUTAGE DES VUES ---
+
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'views', 'index.html')));
+app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'views', 'supermarche.html')));
+
+// --- API REST COMPTABILITÉ & POS ---
+
+// 1. Obtenir les sessions & configurations POS
+app.get('/api/pos/sessions', (req, res) => {
+    res.json({ configs: mockPOSConfigs, sessions: mockSessions });
 });
 
-app.post('/api/users', (req, res) => {
-    const newUser = { id: 'usr_' + Date.now(), ...req.body };
-    mockUsers.push(newUser);
-    res.status(201).json(newUser);
-});
+// 2. Ouvrir / Fermer une Session POS avec Bilan
+app.post('/api/pos/session/toggle', (req, res) => {
+    const { pos_id, action, opening_balance, closing_balance } = req.body;
+    let pos = mockPOSConfigs.find(p => p.id === pos_id);
 
-// API Produits filtrés par module
-app.get('/api/products', (req, res) => {
-    const { module: moduleQuery } = req.query;
-    if (moduleQuery) {
-        const filtered = mockProducts.filter(p => p.module === moduleQuery || p.module === 'all');
-        return res.json(filtered);
+    if (!pos) return res.status(404).json({ error: "POS introuvable" });
+
+    if (action === 'OPEN') {
+        const newSession = {
+            id: 'sess_' + Date.now(),
+            pos_id: pos.id,
+            opened_at: new Date().toISOString(),
+            opening_balance: parseFloat(opening_balance || 0),
+            status: 'OPEN',
+            total_sales: 0
+        };
+        mockSessions.push(newSession);
+        pos.status = 'OPEN';
+        pos.activeSessionId = newSession.id;
+
+        envoyerNotificationWhatsAppAdmin("Ouverture de Caisse", `🟢 Caisse '${pos.name}' ouverte avec un fond de caisse de ${opening_balance} FCFA.`);
+        return res.json({ message: "Session ouverte", session: newSession });
+    } 
+    
+    if (action === 'CLOSE') {
+        let session = mockSessions.find(s => s.id === pos.activeSessionId);
+        if (session) {
+            session.status = 'CLOSED';
+            session.closed_at = new Date().toISOString();
+            session.closing_balance = parseFloat(closing_balance || 0);
+            
+            const totalEcar = session.closing_balance - (session.opening_balance + session.total_sales);
+
+            // Bilan Automatique de clôture généré par l'IA
+            const bilanMsg = `📊 *Bilan de Clôture - ${pos.name}*\n` +
+                `- Fond de Départ : ${session.opening_balance.toLocaleString()} FCFA\n` +
+                `- Ventes de la Session : ${session.total_sales.toLocaleString()} FCFA\n` +
+                `- Attendu en Caisse : ${(session.opening_balance + session.total_sales).toLocaleString()} FCFA\n` +
+                `- Réellement Encaissé : ${session.closing_balance.toLocaleString()} FCFA\n` +
+                `- Écart de Caisse : ${totalEcar === 0 ? '✅ 0 FCFA' : '⚠️ ' + totalEcar + ' FCFA'}`;
+
+            envoyerNotificationWhatsAppAdmin("Bilan Clôture de Caisse", bilanMsg);
+        }
+
+        pos.status = 'CLOSED';
+        pos.activeSessionId = null;
+        return res.json({ message: "Session fermée avec succès", session });
     }
-    res.json(mockProducts);
+
+    res.status(400).json({ error: "Action invalide" });
 });
 
-app.post('/api/products', (req, res) => {
-    const newProduct = { id: 'p_' + Date.now(), ...req.body };
-    mockProducts.unshift(newProduct);
-    res.status(201).json(newProduct);
-});
+// 3. Traitement Vente POS & Génération Écritures Comptables OHADA
+app.post('/api/pos/order', (req, res) => {
+    const { pos_id, session_id, items, payment_method, cashier_name } = req.body;
 
-// API Ventes & Génération automatique d'écritures comptables
-app.post('/api/sales', (req, res) => {
-    const { items, total, payment_method, client_name, client_whatsapp, analytic_center, cashier_id, module } = req.body;
+    let session = mockSessions.find(s => s.id === session_id);
+    if (!session || session.status !== 'OPEN') {
+        return res.status(400).json({ error: "Session de caisse fermée ou invalide" });
+    }
 
-    const ticketRef = 'TICK-' + Math.floor(100000 + Math.random() * 900000);
-    const sale = {
-        id: 'sale_' + Date.now(),
-        ticket_ref: ticketRef,
-        module: module || 'boutique',
-        cashier_id: cashier_id || 'DEFAULT_CASHIER',
+    let orderTotal = 0;
+    let totalCostOfGoods = 0;
+
+    // Déstockage et calculs
+    items.forEach(item => {
+        let prod = mockProducts.find(p => p.id === item.id);
+        if (prod) {
+            prod.stock_qty -= item.qty;
+            orderTotal += prod.retail_price * item.qty;
+            totalCostOfGoods += prod.cost_price * item.qty;
+        }
+    });
+
+    const orderRef = 'POS-' + Math.floor(100000 + Math.random() * 900000);
+    const order = {
+        id: 'ord_' + Date.now(),
+        ref: orderRef,
+        pos_id,
+        session_id,
         items,
-        total,
-        payment_method: payment_method || 'CASH',
-        client_name: client_name || 'Client Passage',
-        client_whatsapp: client_whatsapp || null,
-        scanned_at_exit: false,
+        total_amount: orderTotal,
+        payment_method,
+        cashier_name,
         created_at: new Date().toISOString()
     };
 
-    mockSales.unshift(sale);
+    mockSales.unshift(order);
+    session.total_sales += orderTotal;
 
-    // Écriture Comptable Automatique (Système OHADA / Général)
-    const journalEntry = {
-        id: 'ecr_' + Date.now(),
-        date: new Date().toISOString(),
-        ref: ticketRef,
-        libelle: `Vente ${module || 'Comptant'} - Ticket ${ticketRef}`,
+    // Écritures comptables selon le système OHADA
+    const dateISO = new Date().toISOString();
+    
+    // Écriture 1 : Enregistrement de la vente (Trésorerie / Chiffre d'Affaires)
+    mockAccountingEntries.push({
+        id: 'ecr_' + Date.now() + '_1',
+        date: dateISO,
+        ref: orderRef,
+        libelle: `Vente POS ${pos_id} - Ticket ${orderRef}`,
         debit_account: payment_method === 'MOBILE_MONEY' ? '521100 (Banque/Mobile)' : '571100 (Caisse)',
-        credit_account: '701100 (Ventes de marchandises)',
-        amount: total,
-        analytic_center: analytic_center || (module ? module.toUpperCase() : 'GENERIC_STORE')
-    };
-    mockAccountingEntries.unshift(journalEntry);
+        credit_account: '701100 (Vente de marchandises)',
+        amount: orderTotal
+    });
 
-    res.status(201).json({ sale, journalEntry });
+    // Écriture 2 : Enregistrement de la variation de stock (COGS / Sortie de Stock)
+    mockAccountingEntries.push({
+        id: 'ecr_' + Date.now() + '_2',
+        date: dateISO,
+        ref: orderRef,
+        libelle: `Variation Stock - Ticket ${orderRef}`,
+        debit_account: '603100 (Variation des stocks de marchandises)',
+        credit_account: '311100 (Stock de marchandises)',
+        amount: totalCostOfGoods
+    });
+
+    // Analyse IA prédictive immédiate pour alerte de réapprovisionnement
+    const alertes = analyserStocksEtAlertesIA();
+    if (alertes.length > 0) {
+        alertes.forEach(a => envoyerNotificationWhatsAppAdmin("Alerte Réapprovisionnement", a.message));
+    }
+
+    res.status(201).json({ order, alertes_declenchees: alertes.length });
 });
 
-// API Sécurité Gardien (Scan QR Code à la sortie)
-app.get('/api/verify-ticket/:ticketRef', (req, res) => {
-    const { ticketRef } = req.params;
-    const sale = mockSales.find(s => s.ticket_ref === ticketRef);
-
-    if (!sale) {
-        return res.status(404).json({ valid: false, message: 'Ticket Invalide ou Introuvable !' });
-    }
-
-    if (sale.scanned_at_exit) {
-        return res.status(400).json({ 
-            valid: false, 
-            message: 'ALERTE : Ce ticket a DEJA été scanné à la sortie !',
-            scanned_at: sale.scanned_time
-        });
-    }
-
-    // Validation et Marquage
-    sale.scanned_at_exit = true;
-    sale.scanned_time = new Date().toISOString();
-
+// 4. Consultation du Grand Livre Comptable OHADA
+app.get('/api/accounting/ledger', (req, res) => {
     res.json({
-        valid: true,
-        message: 'TICKET VALIDÉ - SORTIE AUTORISÉE',
-        ticket_ref: sale.ticket_ref,
-        total: sale.total,
-        items_count: sale.items ? sale.items.length : 0,
-        items: sale.items,
-        time: sale.scanned_time
+        total_entries: mockAccountingEntries.length,
+        entries: mockAccountingEntries
     });
 });
 
-// API Comptabilité (Consortium & Rapports)
-app.get('/api/accounting/entries', (req, res) => {
-    res.json(mockAccountingEntries);
-});
-
-// Lancement du Serveur
 app.listen(PORT, () => {
     console.log(`================================================`);
     console.log(`  SYA OS Core running on port ${PORT}`);
-    console.log(`  Local URL: http://localhost:${PORT}`);
+    console.log(`  Odoo-based POS & OHADA Engine active`);
     console.log(`================================================`);
 });
