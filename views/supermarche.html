@@ -3,200 +3,203 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SYA OS — Multi-POS Supermarché & Comptabilité Odoo</title>
+  <title>SYA OS — Système de Gestion de Supermarché</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --bg-main: #0f172a; --panel-bg: #1e293b; --card-bg: #334155;
-      --accent-green: #10b981; --accent-blue: #3b82f6; --accent-amber: #f59e0b;
-      --border-color: #475569; --text-muted: #94a3b8;
+      --bg-dark: #0f172a; --panel-bg: #1e293b; --card-bg: #334155;
+      --accent-green: #10b981; --accent-blue: #3b82f6; --accent-red: #ef4444;
+      --accent-amber: #f59e0b; --text-light: #f8fafc; --text-muted: #94a3b8;
     }
-    body { background: var(--bg-main); color: #f8fafc; font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 0; }
+    body { background: var(--bg-dark); color: var(--text-light); font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; }
     
-    header { background: var(--panel-bg); border-bottom: 1px solid var(--border-color); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
-    .pos-layout { display: grid; grid-template-columns: 300px 1fr 400px; gap: 15px; padding: 15px; height: calc(100vh - 70px); box-sizing: border-box; }
+    .nav-bar { background: var(--panel-bg); border-bottom: 1px solid #475569; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .tab-btn { background: transparent; border: none; color: var(--text-muted); font-weight: bold; padding: 8px 16px; cursor: pointer; border-radius: 6px; }
+    .tab-btn.active { background: var(--accent-blue); color: #fff; }
+
+    .container { padding: 20px; }
+    .grid-layout { display: grid; grid-template-columns: 280px 1fr 380px; gap: 15px; height: calc(100vh - 110px); }
     
-    .panel { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 15px; display: flex; flex-direction: column; }
-    .panel-header { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; display: flex; justify-content: space-between; }
-    
-    .pos-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
-    .pos-card.active { border-color: var(--accent-green); background: rgba(16, 185, 129, 0.1); }
-    
-    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; overflow-y: auto; flex: 1; }
-    .product-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; }
-    .product-card:hover { border-color: var(--accent-blue); }
-    
-    .cart-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 10px; }
-    .cart-table th, .cart-table td { padding: 8px; border-bottom: 1px solid var(--border-color); text-align: left; }
-    
-    .btn { padding: 10px 14px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
+    .panel { background: var(--panel-bg); border-radius: 10px; padding: 15px; border: 1px solid #475569; display: flex; flex-direction: column; }
+    .panel-header { font-weight: bold; font-size: 13px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; overflow-y: auto; }
+    .product-card { background: var(--card-bg); border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; position: relative; }
+    .badge-anti-gaspi { position: absolute; top: 4px; right: 4px; background: var(--accent-red); font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+
+    .cart-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .cart-table th, .cart-table td { padding: 8px; border-bottom: 1px solid #475569; text-align: left; }
+
+    .btn { padding: 10px; border: none; border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 8px; }
     .btn-green { background: var(--accent-green); color: #fff; }
     .btn-blue { background: var(--accent-blue); color: #fff; }
-    .btn-amber { background: var(--accent-amber); color: #000; }
+    .btn-red { background: var(--accent-red); color: #fff; }
+
+    .badge-status { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+    .status-open { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); }
   </style>
 </head>
 <body>
 
-  <header>
-    <div style="display:flex; align-items:center; gap:12px;">
-      <h2 style="margin:0; font-size:18px;">SYA OS <span style="font-size:12px; color:var(--accent-blue);">| ARCHITECTURE ODOO POS</span></h2>
+  <div class="nav-bar">
+    <div style="font-weight:bold; font-size:18px;">SYA OS <span style="font-size:12px; color:var(--accent-blue);">| Supermarket Suite</span></div>
+    <div>
+      <button class="tab-btn active" onclick="showModule('pos')">🛒 POS & Caisses</button>
+      <button class="tab-btn" onclick="showModule('self')">📱 Borne Libre-Service</button>
+      <button class="tab-btn" onclick="showModule('avarie')">🚨 Avaries & Casse</button>
+      <button class="tab-btn" onclick="showModule('config')">⚙️ Config Facturation</button>
     </div>
-    <div id="sessionStatusBadge" style="background:rgba(16, 185, 129, 0.2); color:var(--accent-green); padding:6px 12px; border-radius:20px; font-size:12px; font-weight:bold;">
-      ● Session Active : Caisse 01
-    </div>
-  </header>
+  </div>
 
-  <div class="pos-layout">
+  <div class="container">
     
-    <!-- COLONNE 1 : GESTION MULTI-SESSIONS & POS -->
-    <div class="panel">
-      <div class="panel-header"><span>🖥️ Points de Vente (POS)</span></div>
-      <div id="posList">
-        <!-- Rempli dynamiquement -->
-      </div>
-
-      <div style="margin-top: auto; border-top: 1px solid var(--border-color); padding-top: 10px;">
-        <div class="panel-header"><span>⚙️ Actions Session</span></div>
-        <button class="btn btn-blue" onclick="ouvrirSession()">Ouvrir Nouvelle Session</button>
-        <button class="btn btn-amber" onclick="cloturerSession()">Fermer Caisse & Bilan</button>
-      </div>
-    </div>
-
-    <!-- COLONNE 2 : CATALOGUE PRODUITS & SCANNER -->
-    <div class="panel">
-      <div class="panel-header"><span>📦 Produits & Stock Renseigné</span></div>
-      <input type="text" placeholder="🔍 Rechercher un produit ou scanner le code-barres..." style="width:100%; padding:10px; background:var(--card-bg); border:1px solid var(--border-color); color:#fff; border-radius:6px; margin-bottom:12px; box-sizing:border-box;">
+    <!-- MODULE 1 : CAISSE & POS STANDARD -->
+    <div id="mod_pos" class="grid-layout">
       
-      <div class="product-grid" id="productGrid">
-        <div class="product-card" onclick="ajouterAuPanier('p1', 'Riz Parfumé 50kg', 25000)">
-          <strong>Riz Parfumé 50kg</strong><br>
-          <small style="color:var(--text-muted);">Stock: 15</small><br>
-          <span style="color:var(--accent-green); font-weight:bold;">25 000 F</span>
+      <!-- POS Selection -->
+      <div class="panel">
+        <div class="panel-header">Points de Vente</div>
+        <div class="product-card" style="margin-bottom:10px; border:1px solid var(--accent-green);">
+          <strong>Caisse Principale 01</strong><br>
+          <span class="badge-status status-open">● SESSION OUVERTE</span>
         </div>
-        <div class="product-card" onclick="ajouterAuPanier('p2', 'Huile Raffinée 1L', 1350)">
-          <strong>Huile Raffinée 1L</strong><br>
-          <small style="color:var(--text-muted);">Stock: 8</small><br>
-          <span style="color:var(--accent-green); font-weight:bold;">1 350 F</span>
-        </div>
-        <div class="product-card" onclick="ajouterAuPanier('p3', 'Lait Concentré 1kg', 800)">
-          <strong>Lait Concentré 1kg</strong><br>
-          <small style="color:var(--text-muted);">Stock: 45</small><br>
-          <span style="color:var(--accent-green); font-weight:bold;">800 F</span>
+        <button class="btn btn-blue" onclick="getBarcodeLabel('p1')">🏷️ Imprimer Étiquette Code-Barres</button>
+      </div>
+
+      <!-- Catalogue Produits -->
+      <div class="panel">
+        <div class="panel-header">Catalogue Rayon</div>
+        <div class="product-grid" id="posProductGrid">
+          <!-- Injecté dynamiquement -->
         </div>
       </div>
+
+      <!-- Panier Caisse -->
+      <div class="panel">
+        <div class="panel-header">Ticket en cours</div>
+        <div style="flex:1; overflow-y:auto;">
+          <table class="cart-table">
+            <thead><tr><th>Article</th><th>Qté</th><th>Total</th></tr></thead>
+            <tbody id="cartTableBody"></tbody>
+          </table>
+        </div>
+        <div style="background:var(--card-bg); padding:10px; border-radius:6px; text-align:center; margin-bottom:8px;">
+          <small>Total A Payer (TTC)</small>
+          <div style="font-size:22px; font-weight:bold; color:var(--accent-green);" id="cartTotalDisplay">0 FCFA</div>
+        </div>
+        <button class="btn btn-green" onclick="checkout('CASH')">💵 Encaisser Espèces</button>
+        <button class="btn btn-blue" onclick="checkout('MOBILE_MONEY')">📲 Encaisser Mobile Money</button>
+      </div>
+
     </div>
 
-    <!-- COLONNE 3 : COMMANDE EN COURS & ENCAISSEMENT -->
-    <div class="panel">
-      <div class="panel-header"><span>🛒 Panier Caisse</span></div>
-      <div style="flex:1; overflow-y:auto;">
-        <table class="cart-table">
-          <thead>
-            <tr><th>Article</th><th>Qté</th><th>Total</th></tr>
-          </thead>
-          <tbody id="cartBody">
-            <!-- Rempli à la volée -->
-          </tbody>
-        </table>
+    <!-- MODULE 2 : DECLARATION AVARIES -->
+    <div id="mod_avarie" style="display:none;" class="panel">
+      <div class="panel-header">Déclaration de Casse, Péril et Avaries</div>
+      <div style="max-width:500px; display:flex; flex-direction:column; gap:10px;">
+        <label>Produit Concerné :</label>
+        <select id="avarieProduct" style="padding:10px; background:var(--card-bg); color:#fff; border:1px solid #475569; border-radius:6px;"></select>
+        <label>Quantité Abîmée/Perdue :</label>
+        <input type="number" id="avarieQty" value="1" style="padding:10px; background:var(--card-bg); color:#fff; border:1px solid #475569; border-radius:6px;">
+        <label>Motif de la perte :</label>
+        <input type="text" id="avarieReason" placeholder="ex: Produit cassé en rayon, DLC dépassée" style="padding:10px; background:var(--card-bg); color:#fff; border:1px solid #475569; border-radius:6px;">
+        <button class="btn btn-red" onclick="declareAvarie()">🚨 Valider la Perte & Générer Écriture Comptable</button>
       </div>
-
-      <div style="background:var(--card-bg); padding:12px; border-radius:8px; margin-bottom:10px; text-align:center;">
-        <span style="font-size:12px; color:var(--text-muted);">Total À Payer</span><br>
-        <strong style="font-size:24px; color:var(--accent-green);" id="cartTotal">0 FCFA</strong>
-      </div>
-
-      <label style="font-size:11px; color:var(--text-muted);">Mode de Règlement :</label>
-      <select id="paymentMethod" style="width:100%; padding:8px; background:var(--card-bg); color:#fff; border:1px solid var(--border-color); border-radius:6px; margin-bottom:10px;">
-        <option value="CASH">Espèces (Compte 571100)</option>
-        <option value="MOBILE_MONEY">Mobile Money (Compte 521100)</option>
-      </select>
-
-      <button class="btn btn-green" onclick="validerCommande()">✅ Encaisser & Générer Écritures OHADA</button>
     </div>
 
   </div>
 
   <script>
-    let currentCart = [];
-    let activeSessionId = 'sess_101';
-    let activePosId = 'pos_caisse_1';
+    let cart = [];
+    let currentProducts = [];
 
-    function ajouterAuPanier(id, name, price) {
-      let item = currentCart.find(i => i.id === id);
-      if(item) {
-        item.qty++;
-      } else {
-        currentCart.push({ id, name, price, qty: 1 });
-      }
+    async function loadProducts() {
+      const res = await fetch('/api/products');
+      currentProducts = await res.json();
+      
+      const grid = document.getElementById('posProductGrid');
+      const avarieSelect = document.getElementById('avarieProduct');
+      grid.innerHTML = '';
+      avarieSelect.innerHTML = '';
+
+      currentProducts.forEach(p => {
+        grid.innerHTML += `
+          <div class="product-card" onclick="addToCart('${p.id}')">
+            ${p.is_anti_gaspi ? '<span class="badge-anti-gaspi">ANTI-GASPI -40%</span>' : ''}
+            <strong>${p.name}</strong><br>
+            <small style="color:var(--text-muted);">Stock: ${p.stock_wh_shelf}</small><br>
+            <span style="color:var(--accent-green); font-weight:bold;">${p.retail_price} F</span>
+          </div>
+        `;
+        avarieSelect.innerHTML += `<option value="${p.id}">${p.name} (Stock: ${p.stock_wh_shelf})</option>`;
+      });
+    }
+
+    function addToCart(productId) {
+      const p = currentProducts.find(item => item.id === productId);
+      const item = cart.find(i => i.id === productId);
+      if(item) { item.qty++; } else { cart.push({ ...p, qty: 1 }); }
       renderCart();
     }
 
     function renderCart() {
-      const tbody = document.getElementById('cartBody');
+      const tbody = document.getElementById('cartTableBody');
       tbody.innerHTML = '';
       let total = 0;
-
-      currentCart.forEach(item => {
-        let subtotal = item.price * item.qty;
-        total += subtotal;
-        let tr = document.createElement('tr');
-        tr.innerHTML = `<td>${item.name}</td><td>${item.qty}</td><td>${subtotal.toLocaleString()} F</td>`;
-        tbody.appendChild(tr);
+      cart.forEach(i => {
+        let sub = i.retail_price * i.qty;
+        total += sub;
+        tbody.innerHTML += `<tr><td>${i.name}</td><td>${i.qty}</td><td>${sub.toLocaleString()} F</td></tr>`;
       });
-
-      document.getElementById('cartTotal').innerText = total.toLocaleString() + ' FCFA';
+      document.getElementById('cartTotalDisplay').innerText = total.toLocaleString() + ' FCFA';
     }
 
-    async function validerCommande() {
-      if(currentCart.length === 0) return alert("Le panier est vide.");
-
-      const payload = {
-        pos_id: activePosId,
-        session_id: activeSessionId,
-        items: currentCart,
-        payment_method: document.getElementById('paymentMethod').value,
-        cashier_name: 'Paul'
-      };
-
-      const res = await fetch('/api/pos/order', {
+    async function checkout(method) {
+      if(cart.length === 0) return alert("Panier vide");
+      const res = await fetch('/api/pos/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ pos_id: 'pos_1', session_id: 'sess_1001', items: cart, payment_method: method })
+      });
+      const data = await res.json();
+      alert(`✅ Ticket ${data.receipt.ticket_no} Validé !\nTotal TTC: ${data.receipt.total_ttc} FCFA (TVA: ${data.receipt.tva} FCFA)`);
+      cart = [];
+      renderCart();
+      loadProducts();
+    }
+
+    async function declareAvarie() {
+      const payload = {
+        product_id: document.getElementById('avarieProduct').value,
+        qty: parseFloat(document.getElementById('avarieQty').value),
+        reason: document.getElementById('avarieReason').value,
+        cashier: 'Paul'
+      };
+      const res = await fetch('/api/inventory/avarie', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(payload)
       });
-
       if(res.ok) {
-        alert("✅ Vente enregistrée avec succès !\nÉcritures comptables OHADA (Ventes + Variation de stock) comptabilisées.");
-        currentCart = [];
-        renderCart();
-      } else {
-        const err = await res.json();
-        alert("❌ Erreur : " + err.error);
+        alert("Avarie enregistrée. Notification WhatsApp envoyée à l'administrateur.");
+        loadProducts();
       }
     }
 
-    async function ouvrirSession() {
-      const fond = prompt("Entrez le fond de caisse initial (FCFA) :", "50000");
-      if(!fond) return;
-
-      await fetch('/api/pos/session/toggle', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pos_id: activePosId, action: 'OPEN', opening_balance: fond })
-      });
-      alert("Session ouverte avec succès.");
+    async function getBarcodeLabel(productId) {
+      const res = await fetch(`/api/products/barcode/${productId}`);
+      const data = await res.json();
+      alert(`🏷️ ÉTIQUETTE GÉNÉRÉE :\nEAN: ${data.label_data.ean}\nArticle: ${data.label_data.name}\nPrix: ${data.label_data.price}`);
     }
 
-    async function cloturerSession() {
-      const reel = prompt("Entrez le montant total présent en caisse (FCFA) :", "150000");
-      if(!reel) return;
-
-      await fetch('/api/pos/session/toggle', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pos_id: activePosId, action: 'CLOSE', closing_balance: reel })
-      });
-      alert("Session clôturée. Le bilan a été calculé et transmis à l'administrateur.");
+    function showModule(mod) {
+      document.getElementById('mod_pos').style.display = mod === 'pos' ? 'grid' : 'none';
+      document.getElementById('mod_avarie').style.display = mod === 'avarie' ? 'block' : 'none';
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
     }
+
+    loadProducts();
   </script>
 </body>
 </html>
