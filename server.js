@@ -3,6 +3,9 @@ const path = require('path');
 const cors = require('cors');
 require('dotenv').config();
 
+// Importation des routes Microfinance & Tontines
+const microfinanceRoutes = require('./routes/microfinance');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -13,6 +16,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Servir les fichiers statiques (Frontend)
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Enregistrement des routes de Microfinance
+app.use('/', microfinanceRoutes);
 
 // --- VUES HTML ---
 app.get('/', (req, res) => {

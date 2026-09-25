@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SYA OS — Hub Microfinance, Tontines & Intelligence Terrain</title>
+  <title>SYA OS — Module Microfinance, Tontines & Collecte Live</title>
   <link rel="stylesheet" href="/css/portal.css" />
   <style>
     :root {
@@ -23,7 +23,7 @@
     .brand { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.5px; text-decoration: none; }
     .badge-mod { background: rgba(37, 211, 102, 0.15); color: var(--accent-wa); border: 1px solid rgba(37, 211, 102, 0.3); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
     
-    .mf-layout { display: grid; grid-template-columns: 340px 1fr 420px; gap: 20px; padding: 20px; max-width: 1700px; margin: 0 auto; }
+    .mf-layout { display: grid; grid-template-columns: 340px 1fr 420px; gap: 20px; padding: 20px; max-width: 1750px; margin: 0 auto; }
     
     .panel { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; }
     .panel-title { font-size: 13px; font-weight: 700; color: #f3f4f6; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -31,11 +31,21 @@
     .agent-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
     .agent-status { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
     
+    /* Onglets de filtrage du registre */
+    .filter-tabs { display: flex; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+    .tab-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .tab-btn.active { background: var(--accent-blue); color: #fff; border-color: var(--accent-blue); }
+
     .collecte-table { width: 100%; border-collapse: collapse; font-size: 12px; }
     .collecte-table th { text-align: left; padding: 10px; border-bottom: 1px solid var(--border-color); color: var(--text-muted); font-weight: 600; }
     .collecte-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
     
-    .wa-status { background: rgba(37, 211, 102, 0.15); color: var(--accent-wa); border: 1px solid rgba(37, 211, 102, 0.3); padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+    .badge-produit { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; display: inline-block; }
+    .prod-tontine { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .prod-epargne { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .prod-credit { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+    .wa-status { background: rgba(37, 211, 102, 0.15); color: var(--accent-wa); border: 1px solid rgba(37, 211, 102, 0.3); padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; }
     
     .input-field { width: 100%; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 11px; color: #fff; font-size: 13px; box-sizing: border-box; }
     .input-field:focus { border-color: var(--accent-blue); outline: none; }
@@ -54,7 +64,6 @@
     .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; }
     .modal-content { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; width: 480px; padding: 22px; }
 
-    /* Reçu aperçu WhatsApp */
     .receipt-preview { background: #0b141a; border: 1px solid #222d34; border-radius: 8px; padding: 12px; font-family: monospace; font-size: 11px; color: #e9edef; line-height: 1.5; white-space: pre-wrap; margin-top: 10px; }
   </style>
 </head>
@@ -63,19 +72,22 @@
   <header class="header-bar">
     <div style="display: flex; align-items: center; gap: 12px;">
       <a href="/" class="brand">SYA OS</a>
-      <span class="badge-mod">⚡ TONTINES & WHATSAPP ENGINE</span>
+      <span class="badge-mod">⚡ TONTINES & MICROFINANCE ENGINE</span>
     </div>
     <div style="display: flex; gap: 12px; align-items: center;">
-      <button onclick="ouvrirModalCollecteur()" style="background: var(--accent-purple); color: #fff; border: none; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer;">
+      <button onclick="ouvrirModalCollecteur()" style="background: var(--accent-purple); color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer;">
         + Nouveau Collecteur WhatsApp
       </button>
-      <a href="/settings/invoice" style="color: var(--text-muted); text-decoration: none; font-size: 12px;">⚙️ Config API API</a>
+      <!-- RECTIFICATION ICI : BOUTON PROPRE DE CONFIGURATION API WHATSAPP/SMS -->
+      <button onclick="ouvrirModalConfigAPI()" style="background: transparent; border: 1px solid var(--border-color); color: #f3f4f6; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">
+        ⚙️ Config API WhatsApp / SMS
+      </button>
     </div>
   </header>
 
   <main class="mf-layout">
     
-    <!-- SECTION 1: AGENTS & APPAREILLAGE WHATSAPP -->
+    <!-- SECTION 1: COLLECTEURS & BOT WHATSAPP -->
     <section class="panel">
       <div class="panel-title">
         <span>🏃‍♀️ Collecteurs Autorisés</span>
@@ -100,19 +112,31 @@
         </div>
       </div>
 
+      <button onclick="ouvrirModalRapprochement()" style="width: 100%; background: #1f2937; border: 1px solid var(--accent-blue); color: #60a5fa; padding: 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; margin-top: 15px;">
+        📥 Rapprochement de Caisse Agent
+      </button>
+
       <div style="margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color);">
-        <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 6px;">🎙️ Test Simulation Entrée WhatsApp / Note Vocale :</label>
-        <input type="text" id="simuMsg" placeholder="ex: 884 5000 Epargne" class="input-field" style="font-size: 11px; margin-bottom: 8px;" />
+        <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 6px;">🎙️ Simulation Entrée WhatsApp / Vocal :</label>
+        <input type="text" id="simuMsg" placeholder="ex: 884 2000 Tontine" class="input-field" style="font-size: 11px; margin-bottom: 8px;" />
         <button onclick="simulerCollecteWhatsApp()" style="width: 100%; background: #1f2937; border: 1px solid var(--accent-wa); color: var(--accent-wa); padding: 8px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;">
-          ⚡ Traiter comme Message WhatsApp Entrant
+          ⚡ Exécuter Message Agent WhatsApp
         </button>
       </div>
     </section>
 
-    <!-- SECTION 2: REGISTRE CENTRAL & CREDIT SCORING -->
+    <!-- SECTION 2: REGISTRE CENTRAL & FILTRES DE PRODUITS -->
     <section class="panel">
       <div class="panel-title">
         <span>📋 Registre Central des Collectes</span>
+      </div>
+
+      <!-- RESTAURATION DES FILTRES DE PRODUITS -->
+      <div class="filter-tabs">
+        <button class="tab-btn active" onclick="filtrerProduit('TOUT', this)">Tous Produits</button>
+        <button class="tab-btn" onclick="filtrerProduit('Tontine', this)">Tontine</button>
+        <button class="tab-btn" onclick="filtrerProduit('Épargne', this)">Épargne Libre</button>
+        <button class="tab-btn" onclick="filtrerProduit('Crédit', this)">Remboursements</button>
       </div>
 
       <div style="flex:1; overflow-y: auto;">
@@ -120,31 +144,47 @@
           <thead>
             <tr>
               <th>Membre / Carnet</th>
-              <th>Cotisation</th>
-              <th>Solde Total</th>
-              <th>Reçu WhatsApp</th>
+              <th>Produit</th>
+              <th>Montant</th>
+              <th>Nouveau Solde</th>
+              <th>Status WhatsApp</th>
             </tr>
           </thead>
           <tbody id="collecteFeed">
-            <tr>
+            <tr data-produit="Tontine">
               <td><strong>Maman Brigitte</strong><br/><small style="color: var(--text-muted);">#TON-884</small></td>
+              <td><span class="badge-produit prod-tontine">Tontine</span></td>
               <td style="color: #34d399; font-weight: bold;">+2 000 F</td>
-              <td>145 000 FCFA</td>
-              <td><span class="wa-status">✓ Envoye (Reçu Financier)</span></td>
+              <td>145 000 F</td>
+              <td><span class="wa-status">✓ Envoyé</span></td>
+            </tr>
+            <tr data-produit="Épargne">
+              <td><strong>Ets Mbolo & Fils</strong><br/><small style="color: var(--text-muted);">#EP-102</small></td>
+              <td><span class="badge-produit prod-epargne">Épargne</span></td>
+              <td style="color: #34d399; font-weight: bold;">+25 000 F</td>
+              <td>605 000 F</td>
+              <td><span class="wa-status">✓ Envoyé</span></td>
+            </tr>
+            <tr data-produit="Crédit">
+              <td><strong>Ets Ngana & Fils</strong><br/><small style="color: var(--text-muted);">#CR-441</small></td>
+              <td><span class="badge-produit prod-credit">Remb. Crédit</span></td>
+              <td style="color: #fbbf24; font-weight: bold;">+50 000 F</td>
+              <td>120 000 F Restant</td>
+              <td><span class="wa-status">✓ Envoyé</span></td>
             </tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- SECTION 3: RECHERCHE BDD, COMPTE & ÉLIGIBILITÉ CRÉDIT -->
+    <!-- SECTION 3: RECHERCHE CLIENT, ENCAISSEMENT & FICHE D'ÉTAT -->
     <section class="panel">
       <div class="panel-title">
-        <span>⚡ Recherche Client & Credit Scoring</span>
+        <span>⚡ Collecte Flash & État Client</span>
       </div>
 
       <div style="position: relative; margin-bottom: 12px;">
-        <input type="text" id="searchClientInput" oninput="chercherClientBDD()" placeholder="Tapez Nom, Carnet ou Téléphone..." class="input-field" autocomplete="off" />
+        <input type="text" id="searchClientInput" oninput="chercherClientBDD()" placeholder="Rechercher Nom, N° Carnet ou Tél..." class="input-field" autocomplete="off" />
         <div id="autocompleteResults" class="autocomplete-results"></div>
       </div>
 
@@ -163,61 +203,106 @@
 
         <div style="margin-top: 10px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
           <div style="display: flex; justify-content: space-between; font-size: 11px;">
-            <span>Solde Actuel Épargne :</span>
+            <span>Solde Actuel Cumulé :</span>
             <strong id="cardSolde" style="color:#34d399;">0 FCFA</strong>
           </div>
           <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px;">
             <span>Plafond Crédit Autorisé :</span>
-            <strong id="cardCreditMax" style="color:#a78bfa;">300 000 FCFA</strong>
+            <strong id="cardCreditMax" style="color:#a78bfa;">0 FCFA</strong>
           </div>
         </div>
+
+        <button onclick="imprimerEtatClient()" style="width:100%; background: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-blue); color: #60a5fa; padding: 6px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-top: 8px; cursor: pointer;">
+          📄 Générer Fiche d'État / Relevé Client
+        </button>
       </div>
 
       <form id="cashForm" onsubmit="executerEncaissementDirect(event)">
+        <!-- SÉLECTION EXPLICITE DU PRODUIT CONCERNÉ -->
         <div style="margin-bottom: 10px;">
-          <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Montant Versé Ce Jour (FCFA) :</label>
+          <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Type de Produit :</label>
+          <select id="opTypeSelect" class="input-field" onchange="mettreAJourAperçuReçu()">
+            <option value="Tontine">Cotisation Tontine Journalière</option>
+            <option value="Épargne">Dépôt Épargne Volontaire</option>
+            <option value="Crédit">Remboursement Échéance Prêt</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 10px;">
+          <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Montant Versé (FCFA) :</label>
           <input type="number" id="cashAmount" placeholder="ex: 2000" class="input-field" style="font-size: 16px; font-weight: bold; color: #34d399;" required />
         </div>
 
         <button type="submit" class="btn-action">
-          📲 ENCAISSER & TRANSMETTRE LE REÇU CERTIFIÉ
+          📲 ENCAISSER & ENVOYER REÇU CERTIFIÉ
         </button>
       </form>
 
-      <!-- APERÇU DU MESSAGE WHATSAPP FINANCIER -->
-      <div style="margin-top: 15px;">
-        <label style="font-size: 11px; color: var(--text-muted);">Aperçu du Reçu Structuré qui sera envoyé :</label>
+      <!-- APERÇU DU REÇU WHATSAPP STRUCTURÉ -->
+      <div style="margin-top: 12px;">
+        <label style="font-size: 11px; color: var(--text-muted);">Aperçu du Reçu Financier WhatsApp :</label>
         <div class="receipt-preview" id="receiptPreview">🏛️ SYA OS — REÇU FINANCIER
-Sélectionnez un membre et un montant pour prévisualiser le reçu.</div>
+Sélectionnez un membre et un montant.</div>
       </div>
     </section>
 
   </main>
 
-  <!-- MODAL CRÉATION DE COLLECTEUR -->
-  <div id="modalCollecteur" class="modal-overlay">
+  <!-- MODAL CONFIGURATION API WHATSAPP / SMS (Remplace le lien de facture) -->
+  <div id="modalConfigAPI" class="modal-overlay">
     <div class="modal-content">
-      <h3 style="margin-top:0; color:#fff; font-size: 16px;">➕ Créer un Collecteur WhatsApp Terrain</h3>
-      <p style="font-size: 12px; color: var(--text-muted);">L'agent pourra envoyer des WhatsApp ou notes vocales pour valider les collectes en direct.</p>
+      <h3 style="margin-top:0; color:#fff; font-size: 16px;">⚙️ Configuration Passerelle WhatsApp & SMS</h3>
+      <p style="font-size: 12px; color: var(--text-muted);">Paramétrez vos clés API pour l'envoi automatique des reçus et alertes tontines.</p>
       
       <div style="margin-bottom: 12px;">
-        <label style="font-size: 11px; color: var(--text-muted);">Nom Complet du Collecteur :</label>
-        <input type="text" id="newAgentName" placeholder="ex: Amina K." class="input-field" />
+        <label style="font-size: 11px; color: var(--text-muted);">Jeton API WhatsApp Business (Access Token) :</label>
+        <input type="password" value="EAAG123894819238129381923" class="input-field" />
       </div>
 
       <div style="margin-bottom: 12px;">
-        <label style="font-size: 11px; color: var(--text-muted);">Numéro WhatsApp (avec indicatif) :</label>
-        <input type="text" id="newAgentPhone" placeholder="ex: 237699000000" class="input-field" />
+        <label style="font-size: 11px; color: var(--text-muted);">Numéro Téléphone Expéditeur WhatsApp :</label>
+        <input type="text" value="237699000000" class="input-field" />
       </div>
 
       <div style="margin-bottom: 15px;">
-        <label style="font-size: 11px; color: var(--text-muted);">Secteur d'Activité / Marché :</label>
-        <input type="text" id="newAgentZone" placeholder="ex: Marché Mokolo" class="input-field" />
+        <label style="font-size: 11px; color: var(--text-muted);">Fournisseur Gateway SMS Secours (Optionnel) :</label>
+        <select class="input-field">
+          <option>Orange SMS Gateway API</option>
+          <option>MTN SMS API</option>
+          <option>Twilio SMS</option>
+        </select>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button onclick="fermerModalConfigAPI()" style="flex:1; background: #374151; color: #fff; border:none; padding:10px; border-radius:6px; cursor:pointer;">Annuler</button>
+        <button onclick="sauvegarderConfigAPI()" style="flex:1; background: var(--accent-blue); color: #fff; border:none; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer;">Enregistrer Clés API</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CRÉATION DE COLLECTEUR -->
+  <div id="modalCollecteur" class="modal-overlay">
+    <div class="modal-content">
+      <h3 style="margin-top:0; color:#fff; font-size: 16px;">➕ Ajouter un Collecteur WhatsApp</h3>
+      
+      <div style="margin-bottom: 12px;">
+        <label style="font-size: 11px; color: var(--text-muted);">Nom du Collecteur :</label>
+        <input type="text" id="newAgentName" placeholder="ex: Pauline T." class="input-field" />
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <label style="font-size: 11px; color: var(--text-muted);">Numéro WhatsApp :</label>
+        <input type="text" id="newAgentPhone" placeholder="ex: 237655112233" class="input-field" />
+      </div>
+
+      <div style="margin-bottom: 15px;">
+        <label style="font-size: 11px; color: var(--text-muted);">Secteur / Marché d'affectation :</label>
+        <input type="text" id="newAgentZone" placeholder="ex: Secteur Gare" class="input-field" />
       </div>
 
       <div style="display: flex; gap: 10px;">
         <button onclick="fermerModalCollecteur()" style="flex:1; background: #374151; color: #fff; border:none; padding:10px; border-radius:6px; cursor:pointer;">Annuler</button>
-        <button onclick="sauvegarderCollecteur()" style="flex:1; background: var(--accent-purple); color: #fff; border:none; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer;">Activer Collecteur</button>
+        <button onclick="sauvegarderCollecteur()" style="flex:1; background: var(--accent-purple); color: #fff; border:none; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer;">Valider Agent</button>
       </div>
     </div>
   </div>
@@ -226,9 +311,10 @@ Sélectionnez un membre et un montant pour prévisualiser le reçu.</div>
     const bddClients = [
       { id: 1, nom: "Maman Brigitte", phone: "237699123456", carnet: "TON-884", solde: 143000, score: "A+ (Excellent)", creditMax: 500000 },
       { id: 2, nom: "Ets Mbolo & Fils", phone: "237677889900", carnet: "EP-102", solde: 580000, score: "A (Très Bon)", creditMax: 1500000 },
-      { id: 3, nom: "Papa Jean Resto", phone: "237655443322", carnet: "TON-109", solde: 45000, score: "B (Moyen)", creditMax: 100000 }
+      { id: 3, nom: "Ets Ngana & Fils", phone: "237655443322", carnet: "CR-441", solde: 120000, score: "B (Moyen)", creditMax: 200000 }
     ];
 
+    // RECHERCHE DYNAMIQUE BDD
     function chercherClientBDD() {
       const query = document.getElementById('searchClientInput').value.toLowerCase().trim();
       const resultsDiv = document.getElementById('autocompleteResults');
@@ -276,23 +362,40 @@ Sélectionnez un membre et un montant pour prévisualiser le reçu.</div>
       mettreAJourAperçuReçu();
     }
 
+    // FILTRAGE DU REGISTRE PAR PRODUITS
+    function filtrerProduit(produit, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const rows = document.querySelectorAll('#collecteFeed tr');
+      rows.forEach(row => {
+        if (produit === 'TOUT' || row.getAttribute('data-produit') === produit) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
     function mettreAJourAperçuReçu() {
       const name = document.getElementById('selectedName').value || "Client";
       const phone = document.getElementById('selectedPhone').value || "237...";
       const soldeAncien = parseFloat(document.getElementById('selectedSolde').value || 0);
       const montant = parseFloat(document.getElementById('cashAmount').value || 0);
+      const prodType = document.getElementById('opTypeSelect').value;
       const nouveauSolde = soldeAncien + montant;
 
       const txt = `🏛️ *SYA OS — REÇU FINANCIER CERTIFIÉ*
 ----------------------------------------
 📄 Reçu : #REC-${Math.floor(1000 + Math.random() * 9000)}
 👤 Client : ${name} (${document.getElementById('cardCarnet').innerText})
+📂 Produit : ${prodType}
 ----------------------------------------
 💵 Versé ce jour : *${montant.toLocaleString()} FCFA*
 📊 Solde Précédent : ${soldeAncien.toLocaleString()} FCFA
 🟢 *NOUVEAU SOLDE GLOBAL : ${nouveauSolde.toLocaleString()} FCFA*
 ----------------------------------------
-Merci pour votre fidélité !`;
+Transaction certifiée par SYA OS.`;
 
       document.getElementById('receiptPreview').innerText = txt;
     }
@@ -304,31 +407,40 @@ Merci pour votre fidélité !`;
       const phone = document.getElementById('selectedPhone').value;
       const name = document.getElementById('selectedName').value;
       const amount = parseFloat(document.getElementById('cashAmount').value);
+      const prodType = document.getElementById('opTypeSelect').value;
       const soldeAncien = parseFloat(document.getElementById('selectedSolde').value);
       const nouveauSolde = soldeAncien + amount;
 
+      let badgeClass = 'prod-tontine';
+      if(prodType === 'Épargne') badgeClass = 'prod-epargne';
+      if(prodType === 'Crédit') badgeClass = 'prod-credit';
+
       const feed = document.getElementById('collecteFeed');
       const newRow = document.createElement('tr');
+      newRow.setAttribute('data-produit', prodType);
       newRow.innerHTML = `
         <td><strong>${name}</strong><br/><small style="color: var(--text-muted);">${phone}</small></td>
+        <td><span class="badge-produit ${badgeClass}">${prodType}</span></td>
         <td style="color: #34d399; font-weight: bold;">+${amount.toLocaleString()} FCFA</td>
         <td><strong>${nouveauSolde.toLocaleString()} FCFA</strong></td>
-        <td><span class="wa-status">✓ Reçu Financier Expédié</span></td>
+        <td><span class="wa-status">✓ Envoyé</span></td>
       `;
       feed.insertBefore(newRow, feed.firstChild);
 
       const msg = encodeURIComponent(document.getElementById('receiptPreview').innerText);
       window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
 
-      alert(`✅ Versement de ${amount.toLocaleString()} FCFA validé.\nNouveau Solde de ${name} : ${nouveauSolde.toLocaleString()} FCFA.`);
+      alert(`✅ Encaissement enregistré (${prodType}). Reçu WhatsApp transmis à ${name}.`);
       document.getElementById('cashForm').reset();
       document.getElementById('clientCardSelected').style.display = 'none';
     }
 
-    function simulerCollecteWhatsApp() {
-      const input = document.getElementById('simuMsg').value;
-      if(!input) return alert("Saisissez une commande ex: 884 2000 Epargne");
-      alert(`🤖 Bot WhatsApp SYA OS :\nCommandes "${input}" analysée avec succès !\nClient : Maman Brigitte (#TON-884)\nMontant crédité : 2 000 FCFA.`);
+    // MODALS HANDLERS
+    function ouvrirModalConfigAPI() { document.getElementById('modalConfigAPI').style.display = 'flex'; }
+    function fermerModalConfigAPI() { document.getElementById('modalConfigAPI').style.display = 'none'; }
+    function sauvegarderConfigAPI() {
+      alert("Clés API WhatsApp & Gateway SMS enregistrées avec succès !");
+      fermerModalConfigAPI();
     }
 
     function ouvrirModalCollecteur() { document.getElementById('modalCollecteur').style.display = 'flex'; }
@@ -344,8 +456,19 @@ Merci pour votre fidélité !`;
       div.innerHTML = `<div><h4 style="margin:0; font-size:13px;"><span class="agent-status"></span>${name}</h4><p style="margin:0; font-size:11px; color:var(--text-muted);">📱 ${phone}</p></div><strong style="font-size:12px; color:#34d399;">0 FCFA</strong>`;
       list.appendChild(div);
 
-      alert(`Collecteur ${name} enregistré ! Son bot WhatsApp est désormais actif au ${phone}.`);
+      alert(`Collecteur ${name} actif !`);
       fermerModalCollecteur();
+    }
+
+    function simulerCollecteWhatsApp() {
+      const input = document.getElementById('simuMsg').value;
+      if(!input) return alert("Saisissez une commande ex: 884 2000 Tontine");
+      alert(`🤖 Bot WhatsApp SYA OS :\nMessage "${input}" interprété et validé en BDD !`);
+    }
+
+    function imprimerEtatClient() {
+      const name = document.getElementById('selectedName').value;
+      alert(`Génération de la fiche d'état du membre ${name} en cours (Téléchargement PDF & Copie WhatsApp).`);
     }
   </script>
 </body>
