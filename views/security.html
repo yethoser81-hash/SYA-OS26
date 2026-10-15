@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SYA Security — Contrôle Sortie</title>
+  <style>
+    body { background-color: #0f172a; color: white; font-family: system-ui, sans-serif; margin: 0; padding: 20px; text-align: center; }
+    .card { background: #1e293b; border-radius: 16px; padding: 20px; max-width: 450px; margin: 0 auto; border: 1px solid #334155; }
+    h1 { font-size: 20px; margin-bottom: 5px; color: #38bdf8; }
+    p { font-size: 13px; color: #94a3b8; margin-bottom: 20px; }
+    input[type="text"] { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #475569; background: #0f172a; color: white; font-size: 16px; text-align: center; box-sizing: border-box; margin-bottom: 15px; }
+    button { background: #0284c7; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: bold; width: 100%; font-size: 16px; cursor: pointer; }
+    button:hover { background: #0369a1; }
+    #resultArea { margin-top: 20px; padding: 15px; border-radius: 12px; display: none; text-align: left; }
+    .status-valid { background: #065f46; color: #34d399; border: 1px solid #059669; }
+    .status-invalid { background: #881337; color: #f87171; border: 1px solid #dc2626; }
+    .item-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; border-bottom: 1px dashed rgba(255,255,255,0.1); }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>🛡️ SYA Security</h1>
+    <p>Scanner ou saisissez la référence du ticket à la sortie</p>
+
+    <form id="verifyForm">
+      <input type="text" id="ticketInput" placeholder="ex: TICK-892103" autofocus required />
+      <button type="submit">VÉRIFIER LE TICKET</button>
+    </form>
+
+    <div id="resultArea"></div>
+  </div>
+
+  <script>
+    document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const ref = document.getElementById('ticketInput').value.trim();
+      const resArea = document.getElementById('resultArea');
+
+      resArea.style.display = 'block';
+      resArea.className = '';
+      resArea.innerHTML = 'Vérification en cours...';
+
+      try {
+        const res = await fetch(`/api/verify-ticket/${ref}`);
+        const data = await res.json();
+
+        if (res.ok && data.valid) {
+          resArea.className = 'status-valid';
+          let itemsList = (data.items || []).map(i => `<div class="item-row"><span>${i.name}</span><strong>x${i.qty}</strong></div>`).join('');
+          
+          resArea.innerHTML = `
+            <h3 style="margin:0 0 10px 0; font-size:16px;">✅ ${data.message}</h3>
+            <div><strong>Ref:</strong> ${data.ticket_ref}</div>
+            <div><strong>Total Payé:</strong> ${data.total.toLocaleString()} FCFA</div>
+            <hr style="border:0; border-top:1px solid #059669; margin:10px 0;" />
+            <strong>Articles à vérifier (${data.items_count}):</strong>
+            <div style="margin-top:5px;">${itemsList}</div>
+          `;
+        } else {
+          resArea.className = 'status-invalid';
+          resArea.innerHTML = `<h3 style="margin:0; font-size:15px;">❌ ${data.message}</h3>`;
+        }
+      } catch (err) {
+        resArea.className = 'status-invalid';
+        resArea.innerHTML = `<h3 style="margin:0; font-size:15px;">Erreur de connexion au serveur !</h3>`;
+      }
+
+      document.getElementById('ticketInput').value = '';
+    });
+  </script>
+
+</body>
+</html>

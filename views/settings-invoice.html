@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Facture Officielle — SYA OS</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 40px; background: #fff; color: #000; }
+    .invoice-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 20px; }
+    .logo { font-size: 28px; font-weight: bold; color: #1e293b; }
+    .company-details { font-size: 12px; text-align: right; }
+    table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: left; font-size: 12px; }
+    th { background: #f2f2f2; }
+    .total-box { margin-top: 20px; text-align: right; font-size: 16px; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <div class="invoice-header">
+    <div>
+      <div class="logo">SYA OS ENTERPRISE</div>
+      <p style="font-size:12px; margin:5px 0;">Solution Intégrée de Gestion (Boutique, Grossiste, Supermarché)</p>
+    </div>
+    <div class="company-details">
+      <strong>ENTREPRISE YEMGA ET FILS</strong><br>
+      RCCM : CM-YAO-2026-B-001<br>
+      Téléphone : +237 600 00 00 00<br>
+      Email : contact@yemga-fils.cm
+    </div>
+  </div>
+
+  <h3 style="margin-top:30px;">FACTURE N° : FACT-2026-0928</h3>
+  <p style="font-size:12px;"><strong>Client :</strong> Supermarché Partner / Client Passage<br><strong>Date :</strong> 25 Septembre 2026</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Désignation / Article</th>
+        <th>Conditionnement</th>
+        <th>Quantité</th>
+        <th>Prix Unitaire (FCFA)</th>
+        <th>Total (FCFA)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Riz Parfumé Super Extra</td>
+        <td>Sac de 50 kg</td>
+        <td>10</td>
+        <td>22 000</td>
+        <td>220 000</td>
+      </tr>
+      <tr>
+        <td>Huile Raffinée Pure</td>
+        <td>Carton de 15 Litres</td>
+        <td>5</td>
+        <td>18 000</td>
+        <td>90 000</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="total-box">
+    <p>Montant Hors Taxe : 310 000 FCFA</p>
+    <p>TVA (19.25%) : 59 675 FCFA</p>
+    <p style="color:#10b981; font-size:20px;">TOTAL À PAYER : 369 675 FCFA</p>
+  </div>
+
+  <div style="margin-top:50px; font-size:10px; text-align:center; color:#666;">
+    <p>Facture générée automatiquement par SYA OS — Conforme au Système Comptable OHADA.</p>
+  </div>
+
+</body>
+</html>

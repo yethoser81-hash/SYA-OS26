@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>SYA OS — Business Operating System</title>
+
+  <!-- IMPORTANT : public/ est déjà la racine statique du serveur -->
+  <link rel="stylesheet" href="/css/portal.css">
+</head>
+
+<body>
+
+  <div class="portal">
+
+    <header class="portal-header">
+
+      <a href="/" class="logo">
+        <div class="logo-mark">SYA</div>
+
+        <div class="logo-text">
+          <strong>SYA OS</strong>
+          <small>Business Operating System</small>
+        </div>
+      </a>
+
+      <div class="header-actions">
+
+        <select id="languageSelect" class="language-selector">
+          <option value="fr">Français</option>
+          <option value="en">English</option>
+          <option value="ln">Lingála</option>
+          <option value="sw">Kiswahili</option>
+          <option value="pt">Português</option>
+          <option value="es">Español</option>
+          <option value="ar">العربية</option>
+          <option value="ha">Hausa</option>
+        </select>
+
+        <div class="connection-status">
+          <span class="status-dot"></span>
+          <span>SYA Core</span>
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <main class="portal-main">
+
+      <section class="hero">
+
+        <div class="hero-badge">
+          SYA OS
+        </div>
+
+        <h1>
+          Votre entreprise.
+          <br>
+          <span>Un seul système.</span>
+        </h1>
+
+        <p>
+          Sélectionnez votre environnement de travail.
+        </p>
+
+
+        <!-- MOTEUR CENTRAL -->
+
+        <div class="module-search">
+
+          <span class="search-icon">⌕</span>
+
+          <select id="moduleSelect">
+
+            <option value="">
+              Rechercher ou sélectionner un environnement...
+            </option>
+
+            <option value="boutique">
+              Boutique
+            </option>
+
+            <option value="supermarket">
+              Supermarché
+            </option>
+
+            <option value="wholesale">
+              Grossiste
+            </option>
+
+            <option value="microfinance">
+              Microfinance
+            </option>
+
+            <option value="enterprise">
+              Entreprise
+            </option>
+
+          </select>
+
+          <span class="search-arrow">⌄</span>
+
+        </div>
+
+      </section>
+
+
+      <!-- FICHE DU MODULE SÉLECTIONNÉE -->
+
+      <section
+        id="modulePreview"
+        class="module-preview"
+        hidden
+      >
+
+        <div class="preview-header">
+
+          <div class="preview-identity">
+
+            <div
+              id="moduleIcon"
+              class="preview-icon"
+            >
+              🏪
+            </div>
+
+            <div>
+
+              <span
+                id="moduleCategory"
+                class="preview-category"
+              >
+                ENVIRONNEMENT
+              </span>
+
+              <h2 id="moduleTitle">
+                Boutique
+              </h2>
+
+            </div>
+
+          </div>
+
+          <div
+            id="moduleAvailability"
+            class="availability available"
+          >
+            Disponible
+          </div>
+
+        </div>
+
+
+        <p
+          id="moduleDescription"
+          class="preview-description"
+        ></p>
+
+
+        <div class="capability-section">
+
+          <h3>Fonctionnalités</h3>
+
+          <div
+            id="moduleCapabilities"
+            class="capability-grid"
+          ></div>
+
+        </div>
+
+
+        <div class="preview-footer">
+
+          <span id="moduleNote">
+            Environnement opérationnel
+          </span>
+
+          <button
+            id="accessModule"
+            class="access-button"
+            type="button"
+          >
+            Accéder
+            <span>→</span>
+          </button>
+
+        </div>
+
+      </section>
+
+    </main>
+
+
+    <footer class="portal-footer">
+
+      <span>© 2026 SYA OS</span>
+
+      <span>
+        Business Operating System
+      </span>
+
+    </footer>
+
+  </div>
+
+
+  <script src="/js/portal.js"></script>
+
+</body>
+</html>
