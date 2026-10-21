@@ -12,9 +12,8 @@
         
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            /* Arrière-plan rendu beaucoup plus clair et lumineux */
             background: linear-gradient(135deg, rgba(15, 23, 42, 0.55) 0%, rgba(30, 41, 59, 0.65) 100%), 
-                        url('./assets/background.png') no-repeat center center fixed;
+                        url('/assets/background.png') no-repeat center center fixed;
             background-size: cover;
             color: #f8fafc;
             min-height: 100vh;
@@ -26,7 +25,6 @@
             overflow-x: hidden;
         }
 
-        /* Cadre central avec opacité atténuée */
         .portal-card {
             width: 100%;
             max-width: 720px;
@@ -66,6 +64,7 @@
             font-weight: 800;
             letter-spacing: 2px;
             background: linear-gradient(135deg, #ffffff 30%, #93c5fd 100%);
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-transform: uppercase;
@@ -123,26 +122,6 @@
             color: #94a3b8;
         }
 
-        .action-btn {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            border: none;
-            padding: 12px 22px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-
-        .action-btn:hover {
-            opacity: 0.95;
-            transform: translateY(-1px);
-        }
-
-        /* Menu Déroulant */
         .dropdown-results {
             position: absolute;
             top: calc(100% + 8px);
@@ -174,9 +153,8 @@
         .item-title { font-weight: 600; color: #f1f5f9; font-size: 14px; }
         .item-tag { font-weight: 600; color: #34d399; font-size: 11px; background: rgba(52, 211, 153, 0.12); padding: 4px 8px; border-radius: 20px; }
 
-        /* Panneau de sélection des modules transversaux */
         .modules-association-panel {
-            display: none; /* Déroulé dynamiquement lors du choix d'un secteur */
+            display: none;
             margin-top: 24px;
             padding-top: 20px;
             border-top: 1px dashed rgba(255, 255, 255, 0.2);
@@ -246,8 +224,8 @@
             flex-direction: column;
         }
 
-        .option-name { font-size: 13px; font-weight: 600; color: #f8fafc; }
-        .option-desc { font-size: 10px; color: #94a3b8; }
+        .option-name { font-size: 12px; font-weight: 700; color: #f8fafc; }
+        .option-desc { font-size: 10px; color: #34d399; font-weight: 600; margin-top: 2px; }
 
         .launch-btn {
             width: 100%;
@@ -282,7 +260,7 @@
 
     <div class="portal-card">
         <div class="logo-badge">
-            <img src="./assets/sya-logo.png" alt="SYA-OS Logo" onerror="this.parentElement.style.display='none'">
+            <img src="/assets/sya-logo.png" alt="SYA-OS Logo" onerror="this.parentElement.style.display='none'">
         </div>
 
         <h1 class="brand-title">SYA-OS</h1>
@@ -323,10 +301,9 @@
             </div>
         </div>
 
-        <!-- Panneau de souscription aux modules transversaux (RH, Marketing, Compta) -->
         <div id="associationPanel" class="modules-association-panel">
             <div class="panel-title">
-                Modules transversaux à associer
+                SUITES TRANSVERSALES À ASSOCIER
                 <span id="metierBadge" class="selected-metier-badge">Supermarché</span>
             </div>
 
@@ -335,7 +312,7 @@
                     <input type="checkbox" id="modAccounting" checked>
                     <div class="option-info">
                         <span class="option-name">Comptabilité</span>
-                        <span class="option-desc">Générale</span>
+                        <span class="option-desc">Internationale / Multi-Référentiels</span>
                     </div>
                 </label>
 
@@ -343,7 +320,7 @@
                     <input type="checkbox" id="modHR" checked>
                     <div class="option-info">
                         <span class="option-name">Ressources Humaines</span>
-                        <span class="option-desc">Paie & Présences</span>
+                        <span class="option-desc">Complètes</span>
                     </div>
                 </label>
 
@@ -351,7 +328,7 @@
                     <input type="checkbox" id="modMarketing" checked>
                     <div class="option-info">
                         <span class="option-name">Marketing CRM</span>
-                        <span class="option-desc">WhatsApp & Relances</span>
+                        <span class="option-desc">Complet</span>
                     </div>
                 </label>
             </div>
@@ -407,7 +384,6 @@
             metierBadge.textContent = nomLisible;
             dropdown.style.display = 'none';
             
-            // Dérouler le panneau des modules associés
             associationPanel.style.display = 'block';
         }
 
@@ -416,7 +392,6 @@
             const rh = document.getElementById('modHR').checked;
             const mkt = document.getElementById('modMarketing').checked;
 
-            // Redirection vers le dashboard métier avec les modules actifs en Query Params
             const url = `/dashboard?module=${metierSelectionneCode}&accounting=${compta}&hr=${rh}&marketing=${mkt}`;
             window.location.href = url;
         }
