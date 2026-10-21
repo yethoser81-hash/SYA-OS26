@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /**
  * ============================================================================
  * SYA-OS — SERVEUR PRINCIPAL BACKEND (server.js)
@@ -6,23 +5,20 @@
  */
 
 const express = require('express');
-=======
-const express = require('express');
 const path = require('path');
->>>>>>> bc15195f8c6cf31084e96084464d2f3068912087
 const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-<<<<<<< HEAD
 // Middlewares globaux
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Route de test de santé du serveur
+// --- ROUTE DE SANTÉ DU SYSTÈME ---
 app.get('/api/health', (req, res) => {
     res.status(200).json({
         statut: "SUCCÈS",
@@ -32,32 +28,14 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// Montage des routes modulaires (Supermarché, Microfinance, Comptabilité, WhatsApp, etc.)
+// --- MONTAGE DES ROUTES MODULAIRES OFFICIELLES ---
 app.use('/api/onboarding', require('./routes/onboarding'));
 app.use('/api/supermarket', require('./routes/supermarket'));
 app.use('/api/accounting', require('./routes/accounting'));
-app.use('/api/whatsapp', require('./routes/whatsapp'));
+app.use('/api/hr', require('./routes/hr'));
+app.use('/api/marketing', require('./routes/marketing'));
 
-// Gestion centralisée des erreurs
-app.use((err, req, res, next) => {
-    console.error("Erreur serveur non interceptée :", err.stack);
-    res.status(500).json({
-        statut: "ERREUR",
-        message: "Une erreur interne est survenue sur le serveur SYA-OS.",
-        erreur: err.message
-    });
-});
-
-// Lancement du serveur
-app.listen(PORT, () => {
-    console.log(`[SYA-OS] Serveur de production démarré et actif sur le port ${PORT}`);
-=======
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
-
-// --- BASE DE DONNÉES EN MÉMOIRE (STRUCTURE TYPE ODOO) ---
+// --- BASE DE DONNÉES EN MÉMOIRE (STRUCTURE TYPE ODOO / POS) ---
 
 let mockPOSConfigs = [
     { id: 'pos_caisse_1', name: 'Caisse Principale 01', status: 'OPEN', activeSessionId: 'sess_101', cashier: 'Paul' },
@@ -77,13 +55,12 @@ let mockProducts = [
 let mockSales = [];
 let mockAccountingEntries = [];
 
-// --- MOTEUR IA PRÉDICTIF & SIMULATION NOTIFICATION WHATSAPP/SMS ---
+// --- MOTEUR IA PRÉDICTIF & NOTIFICATION WHATSAPP/SMS ---
 
 function analyserStocksEtAlertesIA() {
     let alertesList = [];
 
     mockProducts.forEach(prod => {
-        // Calcul du nombre de jours de stock restant
         const joursRestants = prod.daily_avg_sales > 0 ? (prod.stock_qty / prod.daily_avg_sales).toFixed(1) : 999;
 
         if (prod.stock_qty <= prod.min_stock_alert || joursRestants <= 3) {
@@ -114,14 +91,12 @@ function envoyerNotificationWhatsAppAdmin(titre, corpsMsg) {
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'views', 'index.html')));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'views', 'supermarche.html')));
 
-// --- API REST COMPTABILITÉ & POS ---
+// --- API REST COMPTABILITÉ & POS EN MÉMOIRE ---
 
-// 1. Obtenir les sessions & configurations POS
 app.get('/api/pos/sessions', (req, res) => {
     res.json({ configs: mockPOSConfigs, sessions: mockSessions });
 });
 
-// 2. Ouvrir / Fermer une Session POS avec Bilan
 app.post('/api/pos/session/toggle', (req, res) => {
     const { pos_id, action, opening_balance, closing_balance } = req.body;
     let pos = mockPOSConfigs.find(p => p.id === pos_id);
@@ -154,7 +129,6 @@ app.post('/api/pos/session/toggle', (req, res) => {
             
             const totalEcar = session.closing_balance - (session.opening_balance + session.total_sales);
 
-            // Bilan Automatique de clôture généré par l'IA
             const bilanMsg = `📊 *Bilan de Clôture - ${pos.name}*\n` +
                 `- Fond de Départ : ${session.opening_balance.toLocaleString()} FCFA\n` +
                 `- Ventes de la Session : ${session.total_sales.toLocaleString()} FCFA\n` +
@@ -173,7 +147,6 @@ app.post('/api/pos/session/toggle', (req, res) => {
     res.status(400).json({ error: "Action invalide" });
 });
 
-// 3. Traitement Vente POS & Génération Écritures Comptables OHADA
 app.post('/api/pos/order', (req, res) => {
     const { pos_id, session_id, items, payment_method, cashier_name } = req.body;
 
@@ -185,7 +158,6 @@ app.post('/api/pos/order', (req, res) => {
     let orderTotal = 0;
     let totalCostOfGoods = 0;
 
-    // Déstockage et calculs
     items.forEach(item => {
         let prod = mockProducts.find(p => p.id === item.id);
         if (prod) {
@@ -211,10 +183,8 @@ app.post('/api/pos/order', (req, res) => {
     mockSales.unshift(order);
     session.total_sales += orderTotal;
 
-    // Écritures comptables selon le système OHADA
     const dateISO = new Date().toISOString();
     
-    // Écriture 1 : Enregistrement de la vente (Trésorerie / Chiffre d'Affaires)
     mockAccountingEntries.push({
         id: 'ecr_' + Date.now() + '_1',
         date: dateISO,
@@ -225,7 +195,6 @@ app.post('/api/pos/order', (req, res) => {
         amount: orderTotal
     });
 
-    // Écriture 2 : Enregistrement de la variation de stock (COGS / Sortie de Stock)
     mockAccountingEntries.push({
         id: 'ecr_' + Date.now() + '_2',
         date: dateISO,
@@ -236,7 +205,6 @@ app.post('/api/pos/order', (req, res) => {
         amount: totalCostOfGoods
     });
 
-    // Analyse IA prédictive immédiate pour alerte de réapprovisionnement
     const alertes = analyserStocksEtAlertesIA();
     if (alertes.length > 0) {
         alertes.forEach(a => envoyerNotificationWhatsAppAdmin("Alerte Réapprovisionnement", a.message));
@@ -245,18 +213,20 @@ app.post('/api/pos/order', (req, res) => {
     res.status(201).json({ order, alertes_declenchees: alertes.length });
 });
 
-// 4. Consultation du Grand Livre Comptable OHADA
-app.get('/api/accounting/ledger', (req, res) => {
-    res.json({
-        total_entries: mockAccountingEntries.length,
-        entries: mockAccountingEntries
+// --- GESTION CENTRALISÉE DES ERREURS ---
+app.use((err, req, res, next) => {
+    console.error("Erreur serveur non interceptée :", err.stack);
+    res.status(500).json({
+        statut: "ERREUR",
+        message: "Une erreur interne est survenue sur le serveur SYA-OS.",
+        erreur: err.message
     });
 });
 
+// --- LANCEMENT DU SERVEUR ---
 app.listen(PORT, () => {
     console.log(`================================================`);
     console.log(`  SYA OS Core running on port ${PORT}`);
     console.log(`  based POS & OHADA Engine active`);
     console.log(`================================================`);
->>>>>>> bc15195f8c6cf31084e96084464d2f3068912087
 });
