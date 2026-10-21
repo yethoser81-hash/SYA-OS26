@@ -35,6 +35,33 @@ app.use('/api/accounting', require('./routes/accounting'));
 app.use('/api/hr', require('./routes/hr'));
 app.use('/api/marketing', require('./routes/marketing'));
 
+// --- ROUTAGE OFFICIEL DES VUES (PORTAIL & DASHBOARDS DÉDIÉS) ---
+
+// 1. Page d'accueil racine (Portail d'authentification et sélection de module)
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'index.html'));
+});
+
+// 2. Routage dynamique du Dashboard selon le secteur d'activité / module
+app.get('/dashboard', (req, res) => {
+    const moduleType = req.query.module || 'supermarket';
+    
+    let vueFichier = 'supermarche.html'; // Par défaut
+    if (moduleType === 'microfinance') vueFichier = 'microfinance.html';
+    else if (moduleType === 'boutique') vueFichier = 'boutique.html';
+    else if (moduleType === 'grossiste') vueFichier = 'grossiste.html';
+    else if (moduleType === 'restaurant') vueFichier = 'restaurant.html';
+    else if (moduleType === 'corporate') vueFichier = 'entreprise.html';
+
+    const cheminAbsolu = path.join(__dirname, 'views', vueFichier);
+    res.sendFile(cheminAbsolu, (err) => {
+        if (err) {
+            // Fallback propre vers la vue principale si le fichier spécifique n'existe pas encore
+            res.sendFile(path.join(__dirname, 'views', 'supermarche.html'));
+        }
+    });
+});
+
 // --- BASE DE DONNÉES EN MÉMOIRE (STRUCTURE TYPE ODOO / POS) ---
 
 let mockPOSConfigs = [
@@ -85,11 +112,6 @@ function envoyerNotificationWhatsAppAdmin(titre, corpsMsg) {
     console.log(`💬 MESSAGE:\n${corpsMsg}`);
     console.log(`================================================\n`);
 }
-
-// --- ROUTAGE DES VUES ---
-
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'views', 'index.html')));
-app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'views', 'supermarche.html')));
 
 // --- API REST COMPTABILITÉ & POS EN MÉMOIRE ---
 
