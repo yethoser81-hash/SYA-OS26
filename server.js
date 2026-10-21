@@ -18,6 +18,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ROUTAGE STATIQUE DES ASSETS DE VUES (Correction définitive des erreurs 404 logo / background)
+app.use('/assets', express.static(path.join(__dirname, 'views', 'assets')));
+
 // --- ROUTE DE SANTÉ DU SYSTÈME ---
 app.get('/api/health', (req, res) => {
     res.status(200).json({
