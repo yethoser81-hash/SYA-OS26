@@ -3,143 +3,374 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYA-OS | Enterprise Engine - Portail d'Accès</title>
+    <title>SYA-OS | Enterprise Business Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, rgba(9, 13, 22, 0.85) 0%, rgba(30, 27, 75, 0.90) 100%), 
-                        url('/assets/background.png') no-repeat center center fixed;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            /* Arrière-plan rendu beaucoup plus clair et lumineux */
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.55) 0%, rgba(30, 41, 59, 0.65) 100%), 
+                        url('./assets/background.png') no-repeat center center fixed;
             background-size: cover;
             color: #f8fafc;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            padding: 20px;
+            overflow-x: hidden;
         }
-        .container {
+
+        /* Cadre central avec opacité atténuée */
+        .portal-card {
             width: 100%;
-            max-width: 650px;
+            max-width: 720px;
             padding: 40px;
+            background: rgba(15, 23, 42, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4),
+                        0 0 30px rgba(59, 130, 246, 0.15);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
         }
-        .logo-area {
-            margin-bottom: 25px;
-            display: flex;
-            flex-direction: column;
+
+        .logo-badge {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
+            background: #ffffff;
+            padding: 8px 20px;
+            border-radius: 14px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
         }
-        .logo-area img {
-            max-height: 55px;
+
+        .logo-badge img {
+            max-height: 42px;
             width: auto;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+            object-fit: contain;
+            mix-blend-mode: multiply;
         }
-        .logo-area h1 {
-            font-size: 26px;
+
+        .brand-title {
+            font-size: 34px;
             font-weight: 800;
             letter-spacing: 2px;
-            color: #ffffff;
+            background: linear-gradient(135deg, #ffffff 30%, #93c5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            margin-bottom: 6px;
         }
-        .logo-area p {
+
+        .brand-subtitle {
             color: #cbd5e1;
             font-size: 14px;
-            margin-top: 8px;
             font-weight: 400;
+            margin-bottom: 28px;
         }
-        .search-wrapper {
+
+        .search-container {
             position: relative;
             width: 100%;
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 8px 16px;
+        }
+
+        .search-box {
             display: flex;
             align-items: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(16px);
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 16px;
+            padding: 6px 8px 6px 18px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
         }
-        .search-wrapper input {
+
+        .search-box:focus-within {
+            border-color: #3b82f6;
+            background: rgba(30, 41, 59, 0.95);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25);
+        }
+
+        .search-icon {
+            color: #94a3b8;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
             width: 100%;
             background: transparent;
             border: none;
             color: #ffffff;
-            font-size: 16px;
-            padding: 12px;
+            font-size: 15px;
+            font-weight: 500;
             outline: none;
+            font-family: inherit;
         }
-        .search-wrapper input::placeholder {
+
+        .search-input::placeholder {
             color: #94a3b8;
         }
+
+        .action-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .action-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        /* Menu Déroulant */
         .dropdown-results {
             position: absolute;
-            top: 100%;
+            top: calc(100% + 8px);
             left: 0;
             right: 0;
             background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            margin-top: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
             display: none;
-            z-index: 10;
+            z-index: 100;
         }
+
         .dropdown-item {
             padding: 14px 20px;
             text-align: left;
             cursor: pointer;
-            border-bottom: 1px solid #334155;
-            transition: background 0.2s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
         .dropdown-item:last-child { border-bottom: none; }
-        .dropdown-item:hover { background: #334155; }
-        .dropdown-item span { font-weight: 600; color: #34d399; font-size: 12px; background: rgba(52, 211, 153, 0.1); padding: 4px 8px; border-radius: 4px; }
-        .footer-info {
-            margin-top: 35px;
+        .dropdown-item:hover { background: rgba(59, 130, 246, 0.2); padding-left: 24px; }
+
+        .item-title { font-weight: 600; color: #f1f5f9; font-size: 14px; }
+        .item-tag { font-weight: 600; color: #34d399; font-size: 11px; background: rgba(52, 211, 153, 0.12); padding: 4px 8px; border-radius: 20px; }
+
+        /* Panneau de sélection des modules transversaux */
+        .modules-association-panel {
+            display: none; /* Déroulé dynamiquement lors du choix d'un secteur */
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.2);
+            text-align: left;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #60a5fa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .selected-metier-badge {
+            background: #3b82f6;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            text-transform: none;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .option-checkbox {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .option-checkbox:hover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .option-checkbox input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #10b981;
+            cursor: pointer;
+        }
+
+        .option-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .option-name { font-size: 13px; font-weight: 600; color: #f8fafc; }
+        .option-desc { font-size: 10px; color: #94a3b8; }
+
+        .launch-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .launch-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        .footer-credits {
+            margin-top: 28px;
             font-size: 11px;
             color: #94a3b8;
             letter-spacing: 1.5px;
+            font-weight: 600;
             text-transform: uppercase;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="logo-area">
-            <!-- Logo officiel -->
-            <img src="/assets/sya-logo.png" alt="SYA-OS Logo" onerror="this.style.display='none'">
-            <h1>SYA-OS</h1>
-            <p>Quel secteur d'activité souhaitez-vous piloter aujourd'hui ?</p>
+    <div class="portal-card">
+        <div class="logo-badge">
+            <img src="./assets/sya-logo.png" alt="SYA-OS Logo" onerror="this.parentElement.style.display='none'">
         </div>
 
-        <div class="search-wrapper">
-            <input type="text" id="moduleSearch" placeholder="Tapez votre métier (Supermarché, Microfinance, Boutique, Restaurant...)" autocomplete="off">
+        <h1 class="brand-title">SYA-OS</h1>
+        <p class="brand-subtitle">Quel secteur d'activité souhaitez-vous piloter aujourd'hui ?</p>
+
+        <div class="search-container">
+            <div class="search-box">
+                <div class="search-icon">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </div>
+                <input type="text" id="moduleSearch" class="search-input" placeholder="Rechercher un secteur (Supermarché, Microfinance, Boutique, Restaurant...)" autocomplete="off">
+            </div>
+
             <div id="resultsDropdown" class="dropdown-results">
-                <div class="dropdown-item" onclick="selectionnerModule('supermarket')">Supermarché & Grande Surface <span>POS / Stock</span></div>
-                <div class="dropdown-item" onclick="selectionnerModule('microfinance')">Microfinance & Épargne / Tontine <span>Finance / Crédit</span></div>
-                <div class="dropdown-item" onclick="selectionnerModule('boutique')">Boutique & Commerce de Détail <span>Vente Rapide</span></div>
-                <div class="dropdown-item" onclick="selectionnerModule('grossiste')">Grossiste & Semi-Gros <span>B2B / Logistique</span></div>
-                <div class="dropdown-item" onclick="selectionnerModule('restaurant')">Restaurant & Bar <span>Cuisine / Tables</span></div>
-                <div class="dropdown-item" onclick="selectionnerModule('corporate')">Entreprise & Services <span>Compta / RH</span></div>
+                <div class="dropdown-item" onclick="selectionnerMetier('supermarket', 'Supermarché & Grande Surface')">
+                    <span class="item-title">Supermarché & Grande Surface</span>
+                    <span class="item-tag">POS / STOCKS</span>
+                </div>
+                <div class="dropdown-item" onclick="selectionnerMetier('microfinance', 'Microfinance & Tontines')">
+                    <span class="item-title">Microfinance & Épargne / Tontines</span>
+                    <span class="item-tag">FINANCE / CRÉDIT</span>
+                </div>
+                <div class="dropdown-item" onclick="selectionnerMetier('boutique', 'Boutique & Détail')">
+                    <span class="item-title">Boutique & Commerce de Détail</span>
+                    <span class="item-tag">VENTE RAPIDE</span>
+                </div>
+                <div class="dropdown-item" onclick="selectionnerMetier('grossiste', 'Grossiste & Semi-Gros')">
+                    <span class="item-title">Grossiste & Semi-Gros</span>
+                    <span class="item-tag">B2B / LOGISTIQUE</span>
+                </div>
+                <div class="dropdown-item" onclick="selectionnerMetier('restaurant', 'Restaurant & Bar')">
+                    <span class="item-title">Restaurant & Bar / Lounge</span>
+                    <span class="item-tag">CUISINE / TABLES</span>
+                </div>
             </div>
         </div>
 
-        <div class="footer-info">
-            SYA-OS ENTERPRISE ENGINE • MULTI-TENANT CLOUD
+        <!-- Panneau de souscription aux modules transversaux (RH, Marketing, Compta) -->
+        <div id="associationPanel" class="modules-association-panel">
+            <div class="panel-title">
+                Modules transversaux à associer
+                <span id="metierBadge" class="selected-metier-badge">Supermarché</span>
+            </div>
+
+            <div class="options-grid">
+                <label class="option-checkbox">
+                    <input type="checkbox" id="modAccounting" checked>
+                    <div class="option-info">
+                        <span class="option-name">Comptabilité</span>
+                        <span class="option-desc">OHADA & Grand Livre</span>
+                    </div>
+                </label>
+
+                <label class="option-checkbox">
+                    <input type="checkbox" id="modHR" checked>
+                    <div class="option-info">
+                        <span class="option-name">Ressources Humaines</span>
+                        <span class="option-desc">Paie & Présences</span>
+                    </div>
+                </label>
+
+                <label class="option-checkbox">
+                    <input type="checkbox" id="modMarketing" checked>
+                    <div class="option-info">
+                        <span class="option-name">Marketing CRM</span>
+                        <span class="option-desc">WhatsApp & Relances</span>
+                    </div>
+                </label>
+            </div>
+
+            <button class="launch-btn" onclick="lancerModuleMetier()">Lancer l'Espace de Travail &rarr;</button>
+        </div>
+
+        <div class="footer-credits">
+            SYA-OS ENTERPRISE ENGINE • MULTI-TENANT ARCHITECTURE
         </div>
     </div>
 
     <script>
         const input = document.getElementById('moduleSearch');
         const dropdown = document.getElementById('resultsDropdown');
+        const associationPanel = document.getElementById('associationPanel');
+        const metierBadge = document.getElementById('metierBadge');
+
+        let metierSelectionneCode = 'supermarket';
 
         input.addEventListener('focus', () => {
             dropdown.style.display = 'block';
@@ -148,22 +379,46 @@
         input.addEventListener('input', (e) => {
             const val = e.target.value.toLowerCase();
             const items = dropdown.getElementsByClassName('dropdown-item');
-            
             dropdown.style.display = 'block';
+            let visibleCount = 0;
+
             Array.from(items).forEach(item => {
                 const text = item.textContent.toLowerCase();
-                item.style.display = text.includes(val) ? 'flex' : 'none';
+                if (text.includes(val)) {
+                    item.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
             });
+
+            if (visibleCount === 0) dropdown.style.display = 'none';
         });
 
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.search-wrapper')) {
+            if (!e.target.closest('.search-container')) {
                 dropdown.style.display = 'none';
             }
         });
 
-        function selectionnerModule(moduleCode) {
-            window.location.href = `/dashboard?module=${moduleCode}`;
+        function selectionnerMetier(code, nomLisible) {
+            metierSelectionneCode = code;
+            input.value = nomLisible;
+            metierBadge.textContent = nomLisible;
+            dropdown.style.display = 'none';
+            
+            // Dérouler le panneau des modules associés
+            associationPanel.style.display = 'block';
+        }
+
+        function lancerModuleMetier() {
+            const compta = document.getElementById('modAccounting').checked;
+            const rh = document.getElementById('modHR').checked;
+            const mkt = document.getElementById('modMarketing').checked;
+
+            // Redirection vers le dashboard métier avec les modules actifs en Query Params
+            const url = `/dashboard?module=${metierSelectionneCode}&accounting=${compta}&hr=${rh}&marketing=${mkt}`;
+            window.location.href = url;
         }
     </script>
 </body>
