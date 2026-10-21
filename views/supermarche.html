@@ -9,234 +9,488 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Sidebar Navigation */
-        .sidebar { width: 260px; background: #1e293b; border-right: 1px solid #334155; display: flex; flex-direction: column; padding: 20px; }
-        .sidebar-brand { font-size: 20px; font-weight: 800; color: #38bdf8; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
-        .menu-label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin: 15px 0 8px 0; }
-        .nav-item { padding: 12px 16px; border-radius: 10px; color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; margin-bottom: 4px; }
-        .nav-item:hover, .nav-item.active { background: #2563eb; color: white; }
-        .whatsapp-badge { background: #22c55e; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: auto; }
-
-        /* Main Content Area */
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: #0f172a; }
-        .topbar { background: #1e293b; border-bottom: 1px solid #334155; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-        .topbar h2 { font-size: 18px; font-weight: 700; }
-        .top-actions { display: flex; gap: 12px; }
-        .btn-pos { background: #10b981; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; text-decoration: none; font-size: 13px; }
-
-        .dashboard-body { padding: 30px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 20px; }
-        .stat-card .title { font-size: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
-        .stat-card .value { font-size: 22px; font-weight: 800; color: #f8fafc; margin-top: 8px; }
-        .stat-card .sub { font-size: 12px; color: #10b981; margin-top: 4px; }
-
-        /* Content Sections */
-        .section-card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 24px; margin-bottom: 25px; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #334155; padding-bottom: 12px; }
-        .section-title { font-size: 16px; font-weight: 700; color: #f8fafc; }
-
-        /* Form Controls */
-        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-group label { font-size: 12px; font-weight: 600; color: #cbd5e1; }
-        .form-group input, .form-group select { background: #0f172a; border: 1px solid #334155; padding: 10px; border-radius: 8px; color: white; outline: none; font-family: inherit; }
-        .btn-primary { background: #2563eb; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 10px; }
-
-        /* Tables */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #334155; font-size: 13px; }
-        th { color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px; }
-        .badge-role { background: rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+        :root {
+            --custom-bg: url('/assets/background.png');
+            --card-bg: rgba(30, 41, 59, 0.88);
+            --border-color: rgba(255, 255, 255, 0.15);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.92) 100%), var(--custom-bg) no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .sync-status { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .sidebar { width: 290px; background: rgba(15, 23, 42, 0.92); border-right: 1px solid var(--border-color); backdrop-filter: blur(16px); display: flex; flex-direction: column; padding: 20px; overflow-y: auto; }
+        .tenant-brand-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px dashed var(--border-color); }
+        .tenant-brand-header img { max-height: 40px; max-width: 75px; object-fit: contain; border-radius: 6px; background: #ffffff; padding: 2px; }
+        .brand-name { font-size: 14px; font-weight: 800; color: #ffffff; }
+        .site-selector-box { margin-bottom: 15px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 10px; padding: 10px; }
+        .site-selector-box label { font-size: 10px; font-weight: 700; color: #93c5fd; text-transform: uppercase; display: block; margin-bottom: 4px; }
+        .site-selector-box select { width: 100%; background: #0f172a; border: 1px solid #3b82f6; color: white; padding: 6px; border-radius: 6px; font-size: 12px; font-weight: 700; outline: none; }
+        .menu-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin: 14px 0 5px 0; }
+        .nav-item { padding: 10px 14px; border-radius: 10px; color: #cbd5e1; text-decoration: none; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; margin-bottom: 3px; }
+        .nav-item:hover, .nav-item.active { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        .topbar { background: rgba(15, 23, 42, 0.75); border-bottom: 1px solid var(--border-color); backdrop-filter: blur(12px); padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; }
+        .topbar h2 { font-size: 18px; font-weight: 800; }
+        .btn-pos { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; text-decoration: none; font-size: 12px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+        .dashboard-body { padding: 28px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 18px; backdrop-filter: blur(12px); }
+        .stat-card .title { font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+        .stat-card .value { font-size: 22px; font-weight: 800; color: #ffffff; margin-top: 6px; }
+        .stat-card .sub { font-size: 11px; color: #38bdf8; margin-top: 4px; font-weight: 600; }
+        .section-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; margin-bottom: 24px; display: none; backdrop-filter: blur(12px); }
+        .section-card.active-section { display: block; }
+        .section-header { margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .section-title { font-size: 16px; font-weight: 800; color: #ffffff; }
+        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 11px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; }
+        .form-group input, .form-group select, .form-group textarea { background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: #ffffff; outline: none; font-size: 13px; font-family: inherit; }
+        .file-upload-box { position: relative; background: rgba(15, 23, 42, 0.85); border: 2px dashed rgba(255, 255, 255, 0.2); border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; }
+        .file-upload-box input[type="file"] { position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; }
+        .file-upload-label { font-size: 11px; font-weight: 600; color: #93c5fd; }
+        .btn-primary { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border: none; padding: 11px 20px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; margin-top: 14px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 12px; }
+        th { color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 10px; }
+        .badge-role { background: rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; }
+        .badge-pin { background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 3px 8px; border-radius: 6px; font-size: 12px; font-family: monospace; font-weight: 700; }
+        .empty-state { text-align: center; padding: 24px; color: var(--text-muted); font-size: 12px; font-style: italic; }
+        .login-test-box { background: rgba(15, 23, 42, 0.95); border: 1px solid #3b82f6; border-radius: 14px; padding: 20px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar / Menu Principal -->
     <div class="sidebar">
-        <div class="sidebar-brand">
-            SYA-OS <span>Supermarché</span>
+        <div class="tenant-brand-header">
+            <img id="tenantLogoPreview" src="/assets/sya-logo.png" alt="Logo">
+            <div>
+                <div id="tenantNameDisplay" class="brand-name">---</div>
+                <div class="sync-status">🟢 Mode Hybride</div>
+            </div>
         </div>
 
-        <div class="menu-label">Pilotage Général</div>
-        <a class="nav-item active" onclick="afficherOnglet('overview')">📊 Vue d'Ensemble</a>
-        <a class="nav-item" onclick="afficherOnglet('boutiques')">🏪 Boutiques & Magasins</a>
-        <a class="nav-item" onclick="afficherOnglet('utilisateurs')">👥 Équipe & Accès WhatsApp <span class="whatsapp-badge">WA Active</span></a>
+        <div class="site-selector-box">
+            <label>📍 Magasin Actif</label>
+            <select id="globalSiteSelector" onchange="changerSiteActif(this.value)">
+                <option value="">-- Aucun magasin sélectionné --</option>
+            </select>
+        </div>
 
-        <div class="menu-label">Gestion Commerciale</div>
-        <a class="nav-item" onclick="afficherOnglet('stocks')">📦 Stocks (Gros & Détail)</a>
-        <a class="nav-item" onclick="afficherOnglet('prix')">🏷️ Prix & Promotions</a>
+        <div class="menu-label">Identité & Groupe</div>
+        <a class="nav-item active" onclick="switchTab('overview', this)">📊 Vue d'Ensemble</a>
+        <a class="nav-item" onclick="switchTab('config', this)">⚙️ Config Enseigne Globale</a>
 
-        <div class="menu-label" id="labelCompta">Suites Associées</div>
-        <a class="nav-item" id="navCompta" onclick="afficherOnglet('compta')">📑 Comptabilité Internationale</a>
-        <a class="nav-item" id="navRH" onclick="afficherOnglet('rh')">👔 Ressources Humaines</a>
-        <a class="nav-item" id="navMkt" onclick="afficherOnglet('marketing')">📲 Marketing WhatsApp</a>
+        <div class="menu-label">Réseau & Gérants</div>
+        <a class="nav-item" onclick="switchTab('boutiques', this)">🏪 Gestion des Magasins & Gérants</a>
+        <a class="nav-item" onclick="switchTab('utilisateurs', this)">👥 Équipe Locale (Caisses, Rayon...)</a>
+        <a class="nav-item" onclick="switchTab('connexion_test', this)">🔑 Portail Connexion (PIN)</a>
+
+        <div class="menu-label">Logistique & Rayons</div>
+        <a class="nav-item" onclick="switchTab('stock_depot', this)">📦 Stock Dépôt Central (Gros)</a>
+        <a class="nav-item" onclick="switchTab('stock_rayon', this)">🏪 Gestion des Rayons par Magasin</a>
+        <a class="nav-item" onclick="switchTab('prix', this)">🏷️ Prix & Promotions</a>
+
+        <div class="menu-label">Pilotage Financier</div>
+        <a class="nav-item" onclick="switchTab('compta', this)">📑 Comptabilité Consolidée</a>
+        <a class="nav-item" onclick="switchTab('rh', this)">👔 Ressources Humaines</a>
+        <a class="nav-item" onclick="switchTab('marketing', this)">📲 Marketing WhatsApp CRM</a>
     </div>
 
-    <!-- Contenu Principal -->
     <div class="main-content">
         <div class="topbar">
-            <h2 id="pageTitle">Tableau de Bord - Vue d'Ensemble</h2>
+            <h2 id="pageTitle">Vue d'Ensemble</h2>
             <div class="top-actions">
-                <a href="/dashboard?module=supermarket&pos=true" class="btn-pos">🛒 Ouvrir la Caisse (POS)</a>
+                <a href="/dashboard?module=supermarket&pos=true" class="btn-pos">🛒 Terminal Caisse (POS)</a>
             </div>
         </div>
 
         <div class="dashboard-body">
 
-            <!-- KPIs Stat -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="title">Chiffre d'Affaires du Jour</div>
-                    <div class="value">1 250 000 FCFA</div>
-                    <div class="sub">+14% vs Hier</div>
+                    <div class="title">Ventes du Jour</div>
+                    <div id="kpiVentes" class="value">0 FCFA</div>
+                    <div class="sub">Aucune transaction</div>
                 </div>
                 <div class="stat-card">
-                    <div class="title">Boutiques Actives</div>
-                    <div class="value">2 Magasins</div>
-                    <div class="sub">Douala & Yaoundé</div>
+                    <div class="title">Magasins Actifs</div>
+                    <div id="kpiBoutiques" class="value">0 Magasin</div>
+                    <div class="sub" id="subSiteActif">Aucun site configuré</div>
                 </div>
                 <div class="stat-card">
-                    <div class="title">Articles en Alerte Stock</div>
-                    <div class="value" style="color: #ef4444;">4 Produit(s)</div>
-                    <div class="sub" style="color: #ef4444;">Notification WA envoyée</div>
+                    <div class="title">Gérants & Personnel</div>
+                    <div id="kpiUsers" class="value">0 Agent</div>
+                    <div class="sub">Équipe active</div>
                 </div>
                 <div class="stat-card">
-                    <div class="title">Collaborateurs Connectés</div>
-                    <div class="value">6 Utilisateurs</div>
-                    <div class="sub">3 Caissières, 1 Comptable, 2 Chefs Rayon</div>
+                    <div class="title">Articles en Rayon</div>
+                    <div id="kpiRayons" class="value">0 Unité</div>
+                    <div class="sub">Disponibles à la vente</div>
                 </div>
             </div>
 
-            <!-- SECTION 1: CRÉATION DES BOUTIQUES ET MAGASINS -->
-            <div class="section-card">
-                <div class="section-header">
-                    <span class="section-title">🏪 Création et Paramétrage des Boutiques / Points de Vente</span>
+            <!-- TAB 1: OVERVIEW -->
+            <div id="tab-overview" class="section-card active-section">
+                <div class="section-header"><span class="section-title">📊 Synthèse de l'Entreprise</span></div>
+                <div class="empty-state" id="overviewWelcomeText">
+                    Bienvenue dans SYA-OS. Allez dans l'onglet <b>"Config Enseigne Globale"</b> pour définir le nom de votre entreprise, puis créez vos magasins et leurs gérants.
                 </div>
-                <form onsubmit="creerBoutique(event)">
+            </div>
+
+            <!-- TAB 2: CONFIG BRANDING -->
+            <div id="tab-config" class="section-card">
+                <div class="section-header"><span class="section-title">⚙️ Configuration de l'Enseigne Mère</span></div>
+                <form onsubmit="enregistrerBranding(event)">
                     <div class="form-grid">
+                        <div class="form-group"><label>Nom de l'Entreprise Mère</label><input type="text" id="cfgBrandName" placeholder="Ex: Ma Société Sarl" required></div>
+                        <div class="form-group"><label>Téléphone / WhatsApp Global</label><input type="text" id="cfgPhone" placeholder="Ex: +237..." required></div>
+                        <div class="form-group"><label>Siège Social / Adresse</label><input type="text" id="cfgCity" placeholder="Ex: Ville / Quartier" required></div>
                         <div class="form-group">
-                            <label>Nom du Point de Vente / Magasin</label>
-                            <input type="text" placeholder="Ex: Supermarché Akwa Central" required>
+                            <label>Logo Global (Depuis votre PC)</label>
+                            <div class="file-upload-box"><input type="file" id="fileLogoInput" accept="image/*" onchange="previewLogo(this)"><div class="file-upload-label" id="labelLogo">📁 Choisir le Logo...</div></div>
                         </div>
-                        <div class="form-group">
-                            <label>Ville / Région</label>
-                            <input type="text" placeholder="Ex: Douala, Akwa" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Responsable du Magasin</label>
-                            <input type="text" placeholder="Ex: M. Jean Talla" required>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Arrière-plan Global / Thème (Depuis votre PC)</label>
+                            <div class="file-upload-box"><input type="file" id="fileBgInput" accept="image/*" onchange="previewBackground(this)"><div class="file-upload-label" id="labelBg">🖼️ Choisir l'Arrière-plan...</div></div>
                         </div>
                     </div>
-                    <button type="submit" class="btn-primary">+ Ajouter le Point de Vente</button>
+                    <button type="submit" class="btn-primary">💾 Enregistrer l'Enseigne</button>
                 </form>
             </div>
 
-            <!-- SECTION 2: GESTION DES UTILISATEURS, RÔLES ET EXPÉDITION ACCÈS WHATSAPP -->
-            <div class="section-card">
-                <div class="section-header">
-                    <span class="section-title">👥 Gestion des Rôles & Envoi des Identifiants par WhatsApp</span>
-                </div>
-                <form onsubmit="creerUtilisateurEtEnvoyerWA(event)">
+            <!-- TAB 3: GESTION DES MAGASINS AVEC GÉRANT NATIF -->
+            <div id="tab-boutiques" class="section-card">
+                <div class="section-header"><span class="section-title">🏪 Création d'un Magasin & Attributs du Gérant</span></div>
+                <form onsubmit="ajouterMagasinEtGerant(event)">
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label>Nom Complet du Collaborateur</label>
-                            <input type="text" id="userNom" placeholder="Ex: Marie Mbarga" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Numéro WhatsApp (avec indicatif)</label>
-                            <input type="text" id="userPhone" placeholder="Ex: +237690000000" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Rôle & Niveau d'Accès Sécurisé</label>
-                            <select id="userRole">
-                                <option value="CAISSIERE">Caissière (Accès Caisse Uniquement)</option>
-                                <option value="COMPTABLE">Comptable (Accès Compta & Balances)</option>
-                                <option value="CHEF_RAYON">Chef de Rayon (Gestion Stocks & Prix)</option>
-                                <option value="RH">Responsable RH (Paie & Personnel)</option>
-                                <option value="ADMIN">Directeur / Admin (Accès Total)</option>
-                            </select>
-                        </div>
+                        <div class="form-group"><label>Nom du Magasin</label><input type="text" id="magNom" placeholder="Saisir le nom du magasin" required></div>
+                        <div class="form-group"><label>Quartier / Adresse Précise</label><input type="text" id="magLieu" placeholder="Saisir l'emplacement" required></div>
+                        <div class="form-group"><label>Nombre de Caisses Physiques</label><input type="number" id="magCaisses" min="1" value="1" required></div>
+                        
+                        <div class="form-group"><label>Nom du Gérant Attitré</label><input type="text" id="gerantNom" placeholder="Nom complet du gérant" required></div>
+                        <div class="form-group"><label>Téléphone WhatsApp du Gérant</label><input type="text" id="gerantPhone" placeholder="Numéro WhatsApp" required></div>
+                        <div class="form-group"><label>Code PIN du Gérant (4 chiffres)</label><input type="text" id="gerantPin" maxlength="4" placeholder="****" required></div>
                     </div>
-                    <button type="submit" class="btn-primary" style="background: #22c55e;">💬 Générer le Token & Envoyer par WhatsApp</button>
+                    <button type="submit" class="btn-primary">+ Créer le Magasin & Activer le Gérant</button>
                 </form>
-
-                <table style="margin-top: 20px;">
-                    <thead>
-                        <tr>
-                            <th>Collaborateur</th>
-                            <th>Téléphone WhatsApp</th>
-                            <th>Rôle</th>
-                            <th>Boutique</th>
-                            <th>Statut</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Marie Mbarga</td>
-                            <td>+237 690 12 34 56</td>
-                            <td><span class="badge-role">CAISSIERE</span></td>
-                            <td>Akwa Central</td>
-                            <td><span style="color: #22c55e;">Actif (Accès Caisse)</span></td>
-                        </tr>
-                        <tr>
-                            <td>Samuel Koffi</td>
-                            <td>+225 07 08 09 10 11</td>
-                            <td><span class="badge-role">COMPTABLE</span></td>
-                            <td>Siège Général</td>
-                            <td><span style="color: #22c55e;">Actif (Accès Compta)</span></td>
-                        </tr>
-                    </tbody>
+                <table>
+                    <thead><tr><th>Code Magasin</th><th>Nom du Magasin</th><th>Adresse</th><th>Gérant Attitré & WhatsApp</th><th>Caisses</th></tr></thead>
+                    <tbody id="listMagasins"><tr><td colspan="5" class="empty-state">Aucun magasin enregistré.</td></tr></tbody>
                 </table>
             </div>
 
-            <!-- SECTION 3: ACHAT EN GROS & DÉCONDITIONNEMENT EN DÉTAIL -->
-            <div class="section-card">
-                <div class="section-header">
-                    <span class="section-title">📦 Achat en Gros & Conversion en Vente au Détail</span>
-                </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Article Achete en Gros</label>
-                        <select>
-                            <option>Carton de Riz Parfumé 50kg (Contient 50 sachets de 1kg)</option>
-                            <option>Carton d'Huile (Contient 12 Bouteilles de 1L)</option>
-                        </select>
+            <!-- TAB 4: PERSONNEL LOCAL -->
+            <div id="tab-utilisateurs" class="section-card">
+                <div class="section-header"><span class="section-title">👥 Équipe Locale du Magasin</span></div>
+                <form onsubmit="ajouterPersonnelLocal(event)">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Nom de l'Employé</label><input type="text" id="empNom" placeholder="Nom de l'employé" required></div>
+                        <div class="form-group"><label>Téléphone WhatsApp</label><input type="text" id="empPhone" placeholder="Téléphone" required></div>
+                        <div class="form-group">
+                            <label>Rôle Hiérarchique</label>
+                            <select id="empRole" required>
+                                <option value="CAISSIERE">Caissière (Terminal POS)</option>
+                                <option value="CHEF_RAYON">Chef de Rayon</option>
+                                <option value="COMPTABLE">Comptable du Magasin</option>
+                                <option value="RH">Responsable RH Local</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Rattacher au Magasin</label>
+                            <select id="empMagasin" required><option value="">-- Choisir un magasin --</option></select>
+                        </div>
+                        <div class="form-group"><label>Code PIN (4 chiffres)</label><input type="text" id="empPin" maxlength="4" placeholder="****" required></div>
                     </div>
-                    <div class="form-group">
-                        <label>Quantité de Cartons Achetés</label>
-                        <input type="number" value="10">
-                    </div>
-                    <div class="form-group">
-                        <label>Prix d'Achat Carton (Gros)</label>
-                        <input type="number" value="22000">
-                    </div>
-                </div>
-                <button class="btn-primary">Déconditionner en Rayon (Conversion Automatique Stock Détail)</button>
+                    <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);">📲 Enregistrer l'Employé</button>
+                </form>
+                <table>
+                    <thead><tr><th>Employé</th><th>Téléphone</th><th>Rôle</th><th>Magasin de Rattachement</th><th>PIN</th></tr></thead>
+                    <tbody id="listPersonnel"><tr><td colspan="5" class="empty-state">Aucun employé local enregistré.</td></tr></tbody>
+                </table>
             </div>
+
+            <!-- TAB 5: PORTAIL CONNEXION -->
+            <div id="tab-connexion_test" class="section-card">
+                <div class="section-header"><span class="section-title">🔑 Portail de Connexion (PIN)</span></div>
+                <div class="login-test-box">
+                    <form onsubmit="testerConnexion(event)">
+                        <div class="form-grid">
+                            <div class="form-group"><label>Téléphone WhatsApp</label><input type="text" id="loginPhone" placeholder="Votre numéro" required></div>
+                            <div class="form-group"><label>Code PIN</label><input type="password" id="loginPin" maxlength="4" placeholder="****" required></div>
+                        </div>
+                        <button type="submit" class="btn-primary">Connexion à mon Espace Magasin</button>
+                    </form>
+                    <div id="loginFeedback" style="margin-top: 15px; font-size: 13px; font-weight: 700;"></div>
+                </div>
+            </div>
+
+            <!-- TAB 6: STOCK DÉPÔT CENTRAL -->
+            <div id="tab-stock_depot" class="section-card">
+                <div class="section-header"><span class="section-title">📦 Stock Dépôt Central (Entrées en Gros)</span></div>
+                <form onsubmit="ajouterEntreeDepot(event)">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Article en Gros</label><input type="text" id="depotNom" placeholder="Nom du produit" required></div>
+                        <div class="form-group"><label>Prix d'Achat (FCFA)</label><input type="number" id="depotAchat" placeholder="0" required></div>
+                        <div class="form-group"><label>Unités par Carton</label><input type="number" id="depotRatio" placeholder="1" required></div>
+                        <div class="form-group"><label>Nombre de Cartons</label><input type="number" id="depotQty" placeholder="0" required></div>
+                    </div>
+                    <button type="submit" class="btn-primary">+ Enregistrer au Dépôt Central</button>
+                </form>
+                <table>
+                    <thead><tr><th>Article</th><th>Cartons</th><th>Unités/Carton</th><th>Total Unités</th><th>Prix Gros</th></tr></thead>
+                    <tbody id="listDepot"><tr><td colspan="5" class="empty-state">Aucun stock central.</td></tr></tbody>
+                </table>
+            </div>
+
+            <!-- TAB 7: GESTION DES RAYONS -->
+            <div id="tab-stock_rayon" class="section-card">
+                <div class="section-header"><span class="section-title">🏪 Répartition & Gestion des Rayons par Magasin</span></div>
+                <form onsubmit="transfererVersRayon(event)">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Sélectionner le Magasin</label><select id="rayonMagasinSelect" required><option value="">-- Choisir un magasin --</option></select></div>
+                        <div class="form-group"><label>Article du Dépôt</label><select id="rayonProduitSelect" required><option value="">-- Choisir un article --</option></select></div>
+                        <div class="form-group"><label>Rayon Cible</label><select id="rayonNom"><option>Rayon Alimentation</option><option>Rayon Boissons</option><option>Rayon Produits Frais</option></select></div>
+                        <div class="form-group"><label>Cartons à Transférer</label><input type="number" id="rayonNbCartons" min="1" placeholder="1" required></div>
+                        <div class="form-group"><label>Prix de Vente Unitaire (FCFA)</label><input type="number" id="rayonPrixVente" placeholder="0" required></div>
+                    </div>
+                    <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">⚡ Affecter au Rayon du Magasin</button>
+                </form>
+                <table>
+                    <thead><tr><th>Magasin</th><th>Article en Rayon</th><th>Emplacement</th><th>Unités Disponibles</th><th>Prix Vente</th></tr></thead>
+                    <tbody id="listRayons"><tr><td colspan="5" class="empty-state">Aucun article dans les rayons.</td></tr></tbody>
+                </table>
+            </div>
+
+            <!-- AUTRES MODULES -->
+            <div id="tab-prix" class="section-card"><div class="section-header"><span class="section-title">🏷️ Prix & Promotions par Magasin</span></div><div class="empty-state">Champs personnalisables par magasin.</div></div>
+            <div id="tab-compta" class="section-card"><div class="section-header"><span class="section-title">📑 Comptabilité Consolidée</span></div><div class="empty-state">Module comptable vide.</div></div>
+            <div id="tab-rh" class="section-card"><div class="section-header"><span class="section-title">👔 Ressources Humaines & Paie</span></div><div class="empty-state">Module RH vide.</div></div>
+            <div id="tab-marketing" class="section-card"><div class="section-header"><span class="section-title">📲 Marketing WhatsApp CRM</span></div><div class="empty-state">Module Marketing vide.</div></div>
 
         </div>
     </div>
 
     <script>
-        function creerBoutique(e) {
-            e.preventDefault();
-            alert("Boutique créée avec succès et enregistrée dans Supabase !");
+        // État applicatif initial totalement VIERGE
+        let db = {
+            branding: { name: '', phone: '', city: '', logo: '/assets/sya-logo.png', bg: '/assets/background.png' },
+            magasins: [],
+            personnel: [],
+            depot: [],
+            rayon: []
+        };
+
+        let currentActiveSite = '';
+        let tempLogo = null, tempBg = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('sya_clean_db');
+            if (saved) {
+                db = JSON.parse(saved);
+                applyBranding();
+                renderAll();
+            }
+        });
+
+        function persist() {
+            localStorage.setItem('sya_clean_db', JSON.stringify(db));
+            renderAll();
         }
 
-        function creerUtilisateurEtEnvoyerWA(e) {
-            e.preventDefault();
-            const nom = document.getElementById('userNom').value;
-            const phone = document.getElementById('userPhone').value;
-            const role = document.getElementById('userRole').value;
-
-            alert(`✅ Identifiants et lien de connexion générés pour ${nom} !\n📲 Notification envoyée sur WhatsApp au numéro ${phone} pour le rôle [${role}].`);
+        function switchTab(id, el) {
+            document.querySelectorAll('.section-card').forEach(s => s.classList.remove('active-section'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active-section');
+            if(el) el.classList.add('active');
+            document.getElementById('pageTitle').textContent = el ? el.textContent.trim() : id;
         }
 
-        function afficherOnglet(nom) {
-            document.getElementById('pageTitle').textContent = 'Tableau de Bord - ' + nom.toUpperCase();
+        function previewLogo(input) {
+            if(input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => { tempLogo = e.target.result; document.getElementById('labelLogo').textContent = "✅ " + input.files[0].name; };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function previewBackground(input) {
+            if(input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => { tempBg = e.target.result; document.getElementById('labelBg').textContent = "✅ " + input.files[0].name; };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function enregistrerBranding(e) {
+            e.preventDefault();
+            db.branding.name = document.getElementById('cfgBrandName').value;
+            db.branding.phone = document.getElementById('cfgPhone').value;
+            db.branding.city = document.getElementById('cfgCity').value;
+            if(tempLogo) db.branding.logo = tempLogo;
+            if(tempBg) db.branding.bg = tempBg;
+            applyBranding();
+            persist();
+            alert("✅ Enseigne enregistrée avec succès !");
+        }
+
+        function applyBranding() {
+            document.getElementById('tenantNameDisplay').textContent = db.branding.name || 'Enseigne non définie';
+            document.getElementById('tenantLogoPreview').src = db.branding.logo;
+            if (db.branding.name) {
+                document.getElementById('overviewWelcomeText').innerHTML = `Bienvenue dans SYA-OS. Vous pilotez l'entreprise <b>${db.branding.name}</b>.`;
+            }
+            if(db.branding.bg) document.documentElement.style.setProperty('--custom-bg', `url('${db.branding.bg}')`);
+        }
+
+        function changerSiteActif(siteId) {
+            currentActiveSite = siteId;
+            const mag = db.magasins.find(m => m.id === siteId);
+            const siteNom = mag ? mag.nom : 'Aucun site actif';
+            document.getElementById('subSiteActif').textContent = siteNom;
+        }
+
+        function ajouterMagasinEtGerant(e) {
+            e.preventDefault();
+            const nom = document.getElementById('magNom').value;
+            const lieu = document.getElementById('magLieu').value;
+            const nbCaisses = parseInt(document.getElementById('magCaisses').value);
+            const gerantNom = document.getElementById('gerantNom').value;
+            const gerantPhone = document.getElementById('gerantPhone').value;
+            const gerantPin = document.getElementById('gerantPin').value;
+
+            let caisses = [];
+            for(let i=1; i<=nbCaisses; i++) caisses.push(`Caisse 0${i}`);
+
+            const magId = 'MAG-' + Date.now().toString().slice(-4);
+
+            db.magasins.push({ id: magId, nom, lieu, gerantNom, gerantPhone, caisses });
+
+            db.personnel.push({
+                id: 'USR-' + Date.now().toString().slice(-4),
+                nom: gerantNom,
+                phone: gerantPhone,
+                role: 'GERANT',
+                magasinId: magId,
+                magasinNom: nom,
+                pin: gerantPin
+            });
+
+            persist();
+            e.target.reset();
+            alert(`✅ Magasin '${nom}' créé avec le Gérant [${gerantNom}] !`);
+        }
+
+        function ajouterPersonnelLocal(e) {
+            e.preventDefault();
+            const nom = document.getElementById('empNom').value;
+            const phone = document.getElementById('empPhone').value;
+            const role = document.getElementById('empRole').value;
+            const magId = document.getElementById('empMagasin').value;
+            const pin = document.getElementById('empPin').value;
+
+            const mag = db.magasins.find(m => m.id === magId);
+            if(!mag) return alert("⚠️ Veuillez créer au moins un magasin !");
+
+            db.personnel.push({ id: 'EMP-' + Date.now().toString().slice(-4), nom, phone, role, magasinId: magId, magasinNom: mag.nom, pin });
+            persist();
+            e.target.reset();
+            alert(`📲 Employé ${nom} ajouté !`);
+        }
+
+        function testerConnexion(e) {
+            e.preventDefault();
+            const phone = document.getElementById('loginPhone').value;
+            const pin = document.getElementById('loginPin').value;
+            const feedback = document.getElementById('loginFeedback');
+            const agent = db.personnel.find(p => p.phone === phone && p.pin === pin);
+
+            if(agent) {
+                feedback.style.color = '#4ade80';
+                feedback.innerHTML = `✅ Connecté : <b>${agent.nom}</b> | Rôle : <span class="badge-role">${agent.role}</span> | Magasin : ${agent.magasinNom}`;
+                setTimeout(() => {
+                    if(agent.role === 'GERANT') {
+                        changerSiteActif(agent.magasinId);
+                        switchTab('overview', document.querySelectorAll('.nav-item')[0]);
+                    } else if(agent.role === 'CAISSIERE') {
+                        window.location.href = '/dashboard?module=supermarket&pos=true';
+                    }
+                }, 1000);
+            } else {
+                feedback.style.color = '#f87171';
+                feedback.textContent = "❌ Identifiants introuvables.";
+            }
+        }
+
+        function ajouterEntreeDepot(e) {
+            e.preventDefault();
+            const nom = document.getElementById('depotNom').value;
+            const achat = Number(document.getElementById('depotAchat').value);
+            const ratio = Number(document.getElementById('depotRatio').value);
+            const qty = Number(document.getElementById('depotQty').value);
+
+            db.depot.push({ id: 'DEP-' + Date.now().toString().slice(-4), nom, achat, ratio, qty, totalUnites: qty * ratio });
+            persist();
+            e.target.reset();
+            alert("✅ Produit ajouté au dépôt !");
+        }
+
+        function transfererVersRayon(e) {
+            e.preventDefault();
+            const magId = document.getElementById('rayonMagasinSelect').value;
+            const depId = document.getElementById('rayonProduitSelect').value;
+            const rayonNom = document.getElementById('rayonNom').value;
+            const cartons = Number(document.getElementById('rayonNbCartons').value);
+            const prixVente = Number(document.getElementById('rayonPrixVente').value);
+
+            const depotItem = db.depot.find(d => d.id === depId);
+            if(!depotItem || depotItem.qty < cartons) return alert("Stock insuffisant.");
+
+            depotItem.qty -= cartons;
+            depotItem.totalUnites = depotItem.qty * depotItem.ratio;
+
+            const magObj = db.magasins.find(m => m.id === magId);
+
+            db.rayon.push({ produit: depotItem.nom, magasin: magObj ? magObj.nom : '', rayon: rayonNom, unites: cartons * depotItem.ratio, prixVente });
+            persist();
+            e.target.reset();
+            alert("⚡ Transfert en rayon effectué !");
+        }
+
+        function renderAll() {
+            document.getElementById('kpiBoutiques').textContent = `${db.magasins.length} Magasin(s)`;
+            document.getElementById('kpiUsers').textContent = `${db.personnel.length} Agent(s)`;
+
+            // Sélecteur Global
+            const selSite = document.getElementById('globalSiteSelector');
+            selSite.innerHTML = '<option value="">-- Choisir un magasin --</option>' + db.magasins.map(m => `<option value="${m.id}">${m.nom}</option>`).join('');
+
+            // Selects Magasins
+            document.getElementById('empMagasin').innerHTML = '<option value="">-- Choisir un magasin --</option>' + db.magasins.map(m => `<option value="${m.id}">${m.nom} (${m.lieu})</option>`).join('');
+            document.getElementById('rayonMagasinSelect').innerHTML = '<option value="">-- Choisir un magasin --</option>' + db.magasins.map(m => `<option value="${m.id}">${m.nom} (${m.lieu})</option>`).join('');
+
+            // Select Dépôt
+            document.getElementById('rayonProduitSelect').innerHTML = '<option value="">-- Choisir un article --</option>' + db.depot.map(d => `<option value="${d.id}">${d.nom} (${d.qty} cartons)</option>`).join('');
+
+            // Table Magasins
+            document.getElementById('listMagasins').innerHTML = db.magasins.length ? db.magasins.map(m => `<tr><td><code>${m.id}</code></td><td><b>${m.nom}</b></td><td>${m.lieu}</td><td><span class="badge-role">👤 ${m.gerantNom}</span> (${m.gerantPhone})</td><td>${m.caisses.join(', ')}</td></tr>`).join('') : '<tr><td colspan="5" class="empty-state">Aucun magasin enregistré.</td></tr>';
+
+            // Table Personnel
+            document.getElementById('listPersonnel').innerHTML = db.personnel.length ? db.personnel.map(p => `<tr><td><b>${p.nom}</b></td><td>${p.phone}</td><td><span class="badge-role">${p.role}</span></td><td>${p.magasinNom}</td><td><span class="badge-pin">${p.pin}</span></td></tr>`).join('') : '<tr><td colspan="5" class="empty-state">Aucun employé local enregistré.</td></tr>';
+
+            // Table Dépôt
+            document.getElementById('listDepot').innerHTML = db.depot.length ? db.depot.map(d => `<tr><td><b>${d.nom}</b></td><td><b style="color:#f59e0b;">${d.qty} cartons</b></td><td>${d.ratio}</td><td>${d.totalUnites} unités</td><td>${d.achat.toLocaleString()} FCFA</td></tr>`).join('') : '<tr><td colspan="5" class="empty-state">Dépôt central vide.</td></tr>';
+
+            // Table Rayons
+            document.getElementById('listRayons').innerHTML = db.rayon.length ? db.rayon.map(r => `<tr><td><b>${r.magasin}</b></td><td>${r.produit}</td><td><span class="badge-role">${r.rayon}</span></td><td><b style="color:#38bdf8;">${r.unites} unités</b></td><td>${r.prixVente.toLocaleString()} FCFA</td></tr>`).join('') : '<tr><td colspan="5" class="empty-state">Aucun article dans les rayons.</td></tr>';
         }
     </script>
 </body>
