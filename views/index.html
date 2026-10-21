@@ -8,8 +8,8 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.95)), 
-                        url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+            background: linear-gradient(135deg, rgba(9, 13, 22, 0.85) 0%, rgba(30, 27, 75, 0.90) 100%), 
+                        url('/assets/background.png') no-repeat center center fixed;
             background-size: cover;
             color: #f8fafc;
             height: 100vh;
@@ -21,62 +21,54 @@
         }
         .container {
             width: 100%;
-            max-width: 750px;
+            max-width: 650px;
             padding: 40px;
             text-align: center;
-            z-index: 10;
         }
         .logo-area {
-            margin-bottom: 35px;
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
-        .logo-badge {
-            display: inline-block;
-            background: rgba(16, 185, 129, 0.15);
-            color: #34d399;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            margin-bottom: 12px;
-            border: 1px solid rgba(52, 211, 153, 0.3);
+        .logo-area img {
+            max-height: 55px;
+            width: auto;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
         }
         .logo-area h1 {
-            font-size: 36px;
+            font-size: 26px;
             font-weight: 800;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             color: #ffffff;
         }
         .logo-area p {
             color: #cbd5e1;
-            font-size: 16px;
+            font-size: 14px;
             margin-top: 8px;
             font-weight: 400;
         }
         .search-wrapper {
             position: relative;
             width: 100%;
-            background: rgba(30, 41, 59, 0.85);
+            background: rgba(15, 23, 42, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            padding: 10px 20px;
+            border-radius: 12px;
+            padding: 8px 16px;
             display: flex;
             align-items: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(16px);
-            transition: all 0.3s ease;
-        }
-        .search-wrapper:hover, .search-wrapper:focus-within {
-            border-color: #34d399;
-            box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.2);
         }
         .search-wrapper input {
             width: 100%;
             background: transparent;
             border: none;
             color: #ffffff;
-            font-size: 18px;
-            padding: 14px;
+            font-size: 16px;
+            padding: 12px;
             outline: none;
         }
         .search-wrapper input::placeholder {
@@ -84,19 +76,20 @@
         }
         .dropdown-results {
             position: absolute;
-            top: 110%;
+            top: 100%;
             left: 0;
             right: 0;
             background: #1e293b;
             border: 1px solid #334155;
-            border-radius: 12px;
+            border-radius: 10px;
+            margin-top: 8px;
             overflow: hidden;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
             display: none;
-            z-index: 20;
+            z-index: 10;
         }
         .dropdown-item {
-            padding: 16px 22px;
+            padding: 14px 20px;
             text-align: left;
             cursor: pointer;
             border-bottom: 1px solid #334155;
@@ -107,13 +100,12 @@
         }
         .dropdown-item:last-child { border-bottom: none; }
         .dropdown-item:hover { background: #334155; }
-        .dropdown-item .module-name { font-weight: 600; color: #f8fafc; font-size: 15px; }
-        .dropdown-item span { font-weight: 600; color: #34d399; font-size: 12px; background: rgba(52, 211, 153, 0.1); padding: 4px 8px; border-radius: 6px; }
+        .dropdown-item span { font-weight: 600; color: #34d399; font-size: 12px; background: rgba(52, 211, 153, 0.1); padding: 4px 8px; border-radius: 4px; }
         .footer-info {
-            margin-top: 50px;
+            margin-top: 35px;
             font-size: 11px;
             color: #94a3b8;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
         }
     </style>
@@ -122,43 +114,26 @@
 
     <div class="container">
         <div class="logo-area">
-            <div class="logo-badge">SYA-OS ENTERPRISE ENGINE</div>
-            <h1>SYA OS</h1>
+            <!-- Logo officiel -->
+            <img src="/assets/sya-logo.png" alt="SYA-OS Logo" onerror="this.style.display='none'">
+            <h1>SYA-OS</h1>
             <p>Quel secteur d'activité souhaitez-vous piloter aujourd'hui ?</p>
         </div>
 
         <div class="search-wrapper">
             <input type="text" id="moduleSearch" placeholder="Tapez votre métier (Supermarché, Microfinance, Boutique, Restaurant...)" autocomplete="off">
             <div id="resultsDropdown" class="dropdown-results">
-                <div class="dropdown-item" onclick="selectionnerModule('supermarket')">
-                    <span class="module-name">Supermarché & Grande Surface</span>
-                    <span>POS / Stock</span>
-                </div>
-                <div class="dropdown-item" onclick="selectionnerModule('microfinance')">
-                    <span class="module-name">Microfinance & Épargne / Tontine</span>
-                    <span>Finance / Crédit</span>
-                </div>
-                <div class="dropdown-item" onclick="selectionnerModule('boutique')">
-                    <span class="module-name">Boutique & Commerce de Détail</span>
-                    <span>Vente Rapide</span>
-                </div>
-                <div class="dropdown-item" onclick="selectionnerModule('grossiste')">
-                    <span class="module-name">Grossiste & Semi-Gros</span>
-                    <span>B2B / Logistique</span>
-                </div>
-                <div class="dropdown-item" onclick="selectionnerModule('restaurant')">
-                    <span class="module-name">Restaurant & Bar</span>
-                    <span>Cuisine / Tables</span>
-                </div>
-                <div class="dropdown-item" onclick="selectionnerModule('corporate')">
-                    <span class="module-name">Entreprise & Services</span>
-                    <span>Compta / RH</span>
-                </div>
+                <div class="dropdown-item" onclick="selectionnerModule('supermarket')">Supermarché & Grande Surface <span>POS / Stock</span></div>
+                <div class="dropdown-item" onclick="selectionnerModule('microfinance')">Microfinance & Épargne / Tontine <span>Finance / Crédit</span></div>
+                <div class="dropdown-item" onclick="selectionnerModule('boutique')">Boutique & Commerce de Détail <span>Vente Rapide</span></div>
+                <div class="dropdown-item" onclick="selectionnerModule('grossiste')">Grossiste & Semi-Gros <span>B2B / Logistique</span></div>
+                <div class="dropdown-item" onclick="selectionnerModule('restaurant')">Restaurant & Bar <span>Cuisine / Tables</span></div>
+                <div class="dropdown-item" onclick="selectionnerModule('corporate')">Entreprise & Services <span>Compta / RH</span></div>
             </div>
         </div>
 
         <div class="footer-info">
-            COMPLIANT OHADA / IFRS • MULTI-TENANT CLOUD
+            SYA-OS ENTERPRISE ENGINE • MULTI-TENANT CLOUD
         </div>
     </div>
 
